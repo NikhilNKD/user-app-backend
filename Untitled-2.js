@@ -14,31 +14,16 @@ console.log({
   db: process.env.DB_HOST,
 });
 
-//const db = mysql.createConnection({
-//  host:process.env.DB_HOST,
-//  user: process.env.DB_NAME,
-//  password: process.env.DB_PASSWORD,
-//  database: "nkd",
-//  port: 21339,
-//  ssl: {
-//    rejectUnauthorized: true,
-//    ca: fs.readFileSync("ca-cert.pem"),
-//  },
-//});
-
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-});
-
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to the database:', err);
-        return;
-    }
-    console.log('Connected to the database');
+  host:process.env.DB_HOST,
+  user: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  database: "nkd",
+  port: 21339,
+  ssl: {
+    rejectUnauthorized: true,
+    ca: fs.readFileSync("ca-cert.pem"),
+  },
 });
 
 const storage = multer.diskStorage({
@@ -108,16 +93,31 @@ app.post('/checkPhoneNumber', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-    const { userId } = req.body;
-  
-    // Simply return a success response without session creation
-    res.status(200).json({ message: 'Login successful' });
-  });
-  
-  // Function to generate a session token (if needed in future)
-  function generateSessionToken() {
-    return crypto.randomBytes(32).toString('hex');
-  }
+  const { userId } = req.body;
+  const sessionToken = generateSessionToken(); // Function to generate session token
+  const loginTime = new Date();
+  const expirationTime = new Date();
+  expirationTime.setDate(expirationTime.getDate() + 10); // Expires after 10 days
+
+  // Insert session data into the database
+  db.query('INSERT INTO sessions (user_id, session_token, login_time, expiration_time) VALUES (?, ?, ?, ?)', 
+      [userId, sessionToken, loginTime, expirationTime],
+      (err, result) => {
+          if (err) {
+              console.error('Error creating session:', err);
+              return res.status(500).json({ message: 'Internal server error' });
+          }
+          res.status(200).json({ sessionToken, expirationTime });
+      }
+  );
+});
+
+// Function to generate a session token
+function generateSessionToken() {
+  // Your session token generation logic here
+  return crypto.randomBytes(32).toString('hex');
+}
+
 
 
 
@@ -535,12 +535,12 @@ app.get('/customerDetails/:phoneNumber', (req, res) => {
 
 //order api
 app.post('/saveOrder', (req, res) => {
-  const { custName, custPhoneNumber, cartItems, totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhoneNumber } = req.body;
+  const { custName, custPhoneNumber, cartItems, totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, phoneNumber } = req.body;
 
-  // Save order details to the database
+  // Save order details to the database (replace with your database logic)
   db.query(
-    'INSERT INTO tbl_orders (customerName, custPhoneNumber, cartItems, totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [custName, custPhoneNumber, JSON.stringify(cartItems), totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhoneNumber],
+    'INSERT INTO tbl_orders (customerName, custPhoneNumber, cartItems, totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhonenumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [custName, custPhoneNumber, JSON.stringify(cartItems), totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, phoneNumber],
     (err, result) => {
       if (err) {
         console.error('Error saving order:', err);
@@ -552,78 +552,39 @@ app.post('/saveOrder', (req, res) => {
   );
 });
 
-app.get('/getOrders', (req, res) => {
-  const { custPhoneNumber } = req.query;
+
+app.get('/orders/shops', (req, res) => {
+  const { customerPhoneNumber } = req.query;
 
   db.query(
-    'SELECT DISTINCT shopID FROM tbl_orders WHERE custPhoneNumber = ?',
-    [custPhoneNumber],
-    (err, results) => {
-      if (err) {
-        console.error('Error fetching orders:', err);
-        return res.status(500).json({ message: 'Internal server error' });
+      'SELECT shopID, shopkeeperPhonenumber FROM tbl_orders WHERE custPhoneNumber = ? GROUP BY shopID, shopkeeperPhonenumber',
+      [customerPhoneNumber],
+      (err, results) => {
+          if (err) {
+              console.error('Error fetching shops:', err);
+              return res.status(500).json({ message: 'Internal server error' });
+          }
+          res.status(200).json(results);
       }
-      res.json(results);
-    }
   );
 });
 
-
-app.get('/getOrderDetails', (req, res) => {
-  const { shopID, custPhoneNumber } = req.query;
+app.get('/orders/shop/:shopkeeperPhoneNumber', (req, res) => {
+  const { shopkeeperPhoneNumber } = req.params;
 
   db.query(
-    'SELECT * FROM tbl_orders WHERE shopID = ? AND custPhoneNumber = ?',
-    [shopID, custPhoneNumber],
-    (err, results) => {
-      if (err) {
-        console.error('Error fetching order details:', err);
-        return res.status(500).json({ message: 'Internal server error' });
+      'SELECT id, shopID, cartItems, totalPrice, selectedDate, selectedTime, created_at, customerName, custPhoneNumber FROM tbl_orders WHERE shopkeeperPhonenumber = ?',
+      [shopkeeperPhoneNumber],
+      (err, results) => {
+          if (err) {
+              console.error('Error fetching orders:', err);
+              return res.status(500).json({ message: 'Internal server error' });
+          }
+          res.status(200).json(results);
       }
-      res.json(results);
-    }
   );
 });
 
-
-
-
-
-
-
- 
- 
-  
-  app.get('/getCustomerStores', (req, res) => {
-    const { custPhoneNumber } = req.query;
-  
-    if (!custPhoneNumber) {
-      return res.status(400).send('Customer phone number is required.');
-    }
-  
-    const query = `
-      SELECT DISTINCT shopID
-      FROM tbl_orders
-      WHERE custPhoneNumber = ?
-      ORDER BY shopID
-    `;
-  
-    db.query(query, [custPhoneNumber], (error, results) => {
-      if (error) {
-        console.error('Error fetching customer stores:', error);
-        return res.status(500).send('Failed to fetch customer stores.');
-      }
-      res.json(results);
-    });
-  });
-  
-  
-  
-  
-  
-
- 
-  
 
 
 
@@ -820,32 +781,6 @@ app.get('/shopkeeperDetails/:shopID', (req, res) => {
       }
   );
 });
-
-app.get('/getShopkeeperDetails', (req, res) => {
-    const { phoneNumber } = req.query;
-  
-    // Validate phoneNumber
-    if (!phoneNumber) {
-      return res.status(400).json({ message: 'Phone number is required' });
-    }
-  
-    db.query(
-      'SELECT * FROM shopkeepers WHERE phoneNumber = ?',
-      [phoneNumber],
-      (err, result) => {
-        if (err) {
-          console.error('Error fetching shopkeeper details:', err);
-          return res.status(500).json({ message: 'Internal server error' });
-        }
-        if (result.length > 0) {
-          res.json(result[0]);
-        } else {
-          res.status(404).json({ message: 'Shopkeeper not found' });
-        }
-      }
-    );
-  });
-  
 
 
 
