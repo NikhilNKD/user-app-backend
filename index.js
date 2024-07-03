@@ -535,65 +535,116 @@ app.get('/customerDetails/:phoneNumber', (req, res) => {
 
 //order api
 app.post('/saveOrder', (req, res) => {
-  const { custName, custPhoneNumber, cartItems, totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhoneNumber } = req.body;
+    const { custName, custPhoneNumber, cartItems, totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhoneNumber } = req.body;
+  
+    
+   
 
-  // Save order details to the database
-  db.query(
-    'INSERT INTO tbl_orders (customerName, custPhoneNumber, cartItems, totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [custName, custPhoneNumber, JSON.stringify(cartItems), totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhoneNumber],
-    (err, result) => {
-      if (err) {
-        console.error('Error saving order:', err);
-        return res.status(500).json({ message: 'Internal server error' });
+    // Save order details to the database
+    db.query(
+      'INSERT INTO tbl_orders (customerName, custPhoneNumber, cartItems, totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [custName, custPhoneNumber, JSON.stringify(cartItems), totalPrice, selectedDate, selectedTime, shopID, shopkeeperName, shopkeeperPhoneNumber],
+      (err, result) => {
+        if (err) {
+          console.error('Error saving order:', err);
+          return res.status(500).json({ message: 'Internal server error' });
+        }
+        console.log('Order saved successfully');
+        res.status(200).json({ message: 'Order saved successfully' });
       }
-      console.log('Order saved successfully');
-      res.status(200).json({ message: 'Order saved successfully' });
-    }
-  );
+    );
+  });
+
+
+ 
+/*********************************************Customer Order*********************************************************************************************************
+ *******************************************************************************************************************************************************
+*/
+
+
+// Example of a GET route to fetch orders
+app.get('/getCustomerOrders', async (req, res) => {
+  const { custPhoneNumber } = req.query;
+
+  try {
+    const orders = await db.query(`
+      SELECT * FROM tbl_orders WHERE custPhoneNumber = ?
+    `, [custPhoneNumber]);
+
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching customer orders:', error);
+    res.status(500).send('Error fetching orders');
+  }
 });
 
+
+
+
+
+
+
+app.post('/placeOrder', (req, res) => {
+    const {
+      custPhoneNumber,
+      shopID,
+      cartItems,
+      totalPrice,
+      selectedDate,
+      selectedTime,
+      created_at,
+      customerName,
+    } = req.body;
+  
+    const query = `
+      INSERT INTO tbl_orders (custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, created_at, customerName)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+  
+    db.query(query, [custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, created_at, customerName], (error) => {
+      if (error) {
+        console.error('Error placing order:', error);
+        return res.status(500).send('Failed to place order.');
+      }
+      res.send('Order placed successfully.');
+    });
+  });
+  
 app.get('/getOrders', (req, res) => {
   const { custPhoneNumber } = req.query;
 
   db.query(
-    'SELECT DISTINCT shopID FROM tbl_orders WHERE custPhoneNumber = ?',
+    'SELECT * FROM tbl_orders WHERE custPhoneNumber = ?',
     [custPhoneNumber],
     (err, results) => {
       if (err) {
         console.error('Error fetching orders:', err);
         return res.status(500).json({ message: 'Internal server error' });
       }
-      res.json(results);
+      res.status(200).json({ orders: results });
     }
   );
 });
+ 
 
-
-app.get('/getOrderDetails', (req, res) => {
-  const { shopID, custPhoneNumber } = req.query;
-
-  db.query(
-    'SELECT * FROM tbl_orders WHERE shopID = ? AND custPhoneNumber = ?',
-    [shopID, custPhoneNumber],
-    (err, results) => {
-      if (err) {
-        console.error('Error fetching order details:', err);
-        return res.status(500).json({ message: 'Internal server error' });
+app.get('/getCustomerOrders', (req, res) => {
+    const { custPhoneNumber } = req.query;
+  
+    if (!custPhoneNumber) {
+      return res.status(400).send('Customer phone number is required.');
+    }
+  
+    const query = 'SELECT * FROM tbl_orders WHERE custPhoneNumber = ? ORDER BY created_at DESC';
+  
+    db.query(query, [custPhoneNumber], (error, results) => {
+      if (error) {
+        console.error('Error fetching customer orders:', error);
+        return res.status(500).send('Failed to fetch customer orders.');
       }
       res.json(results);
-    }
-  );
-});
-
-
-
-
-
-
-
+    });
+  });
  
- 
-  
   app.get('/getCustomerStores', (req, res) => {
     const { custPhoneNumber } = req.query;
   
@@ -617,6 +668,37 @@ app.get('/getOrderDetails', (req, res) => {
     });
   });
   
+  app.get('/getOrderDetails', (req, res) => {
+    const { shopID, custPhoneNumber } = req.query;
+  
+    if (!shopID || !custPhoneNumber) {
+      return res.status(400).send('Shop ID and customer phone number are required.');
+    }
+  
+    const query = `
+      SELECT cartItems, totalPrice
+      FROM tbl_orders
+      WHERE custPhoneNumber = ? AND shopID = ?
+      ORDER BY created_at DESC
+    `;
+  
+    db.query(query, [custPhoneNumber, shopID], (error, results) => {
+      if (error) {
+        console.error('Error fetching order details:', error);
+        return res.status(500).send('Failed to fetch order details.');
+      }
+  
+      console.log('Order Details from Database:', results);  // Log the results to see the cartItems format
+  
+      // Flatten the JSON array from all results
+      const orders = results.map(row => ({
+        ...row,
+        cartItems: JSON.parse(row.cartItems)  // Ensure that cartItems is valid JSON
+      }));
+  
+      res.json(orders);
+    });
+  });
   
   
   
@@ -1659,18 +1741,39 @@ app.get('/myTotalCommission', async (req, res) => {
 
 
 
-// Backend route to fetch all products from product_master
-app.get('/products/:category', (req, res) => {
-  const { category } = req.params;
-  const query = 'SELECT id, main_category, product_name, brand_name, price, weight, picture_path FROM tbl_product_master WHERE type = ?';
-  db.query(query, [category], (error, results) => {
-      if (error) {
-          console.error('Error executing query:', error);
-          return res.status(500).json({ error: 'Database query error' });
-      }
-      res.json(results);
-  });
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 app.post('/selectedProducts', (req, res) => {
@@ -1686,15 +1789,24 @@ app.post('/selectedProducts', (req, res) => {
 });
 
 
+app.get('/products/:category', (req, res) => {
+  const { category } = req.params;
+  const query = 'SELECT id, main_category, product_name, brand_name, price, weight, picture_path FROM tbl_product_master WHERE type = ?';
+  db.query(query, [category], (error, results) => {
+      if (error) {
+          console.error('Error executing query:', error);
+          return res.status(500).json({ error: 'Database query error' });
+      }
+      res.json(results);
+  });
+});
+
+// Route to add product to shopkeeper's list
 app.post('/addProduct', (req, res) => {
-  const { phoneNumber, productId } = req.body;
-  const query = `
-      INSERT INTO shopkeeper_products (phoneNumber, productId)
-      VALUES (?, ?)
-  `;
+  const { shopkeeperPhoneNumber, productId } = req.body; // Ensure the correct variable name here
+  const query = 'INSERT INTO shopkeeper_products (phoneNumber, productId) VALUES (?, ?)';
   
-  // Execute the SQL query
-  db.query(query, [phoneNumber, productId], (err, results) => {
+  db.query(query, [shopkeeperPhoneNumber, productId], (err, results) => {
       if (err) {
           console.error('Error adding product:', err);
           res.status(500).json({ error: 'Internal server error' });
@@ -1703,16 +1815,15 @@ app.post('/addProduct', (req, res) => {
       res.status(200).json({ message: 'Product added successfully' });
   });
 });
-
+// Route to fetch shopkeeper's products
 app.get('/myProducts/:phoneNumber', (req, res) => {
   const { phoneNumber } = req.params;
   const query = `
-      SELECT pm.id, pm.main_category, pm.product_name, pm.brand_name, pm.price, pm.weight
+      SELECT pm.id, pm.main_category, pm.product_name, pm.brand_name, pm.price, pm.weight, pm.picture_path
       FROM shopkeeper_products up
       JOIN tbl_product_master pm ON up.productId = pm.id
       WHERE up.phoneNumber = ?
   `;
-  
   db.query(query, [phoneNumber], (err, results) => {
       if (err) {
           console.error('Error fetching selected products:', err);
@@ -1753,6 +1864,35 @@ app.get('/products/:category', async (req, res) => {
       res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /**************************************************************************************************************************************************************
