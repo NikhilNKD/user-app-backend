@@ -107,36 +107,6 @@ app.post('/checkPhoneNumber', (req, res) => {
   });
 });
 
-app.post('/login', (req, res) => {
-    const { userId } = req.body;
-  
-    // Simply return a success response without session creation
-    res.status(200).json({ message: 'Login successful' });
-  });
-  
-  // Function to generate a session token (if needed in future)
-  function generateSessionToken() {
-    return crypto.randomBytes(32).toString('hex');
-  }
-
-
-
-app.post('/logout', (req, res) => {
-  const { userId } = req.body;
-
-  // Delete session from the database
-  db.query('DELETE FROM sessions WHERE user_id = ?', [userId], (err, result) => {
-      if (err) {
-          console.error('Error logging out:', err);
-          return res.status(500).json({ message: 'Internal server error' });
-      }
-      
-      console.log('Deleted session:', result); // Log the result of the database operation
-
-      res.status(200).json({ message: 'Logged out successfully' });
-  });
-});
-
 
 
 app.get('/mainServices', (req, res) => {
@@ -1246,7 +1216,7 @@ app.get('/shops', (req, res) => {
       FROM shopkeeper 
       WHERE salesAssociateNumber = ?;
   `;
-  connection.query(query, [salesAssociateNumber], (error, results) => {
+  db.query(query, [salesAssociateNumber], (error, results) => {
       if (error) {
           console.error('Error fetching shops:', error);
           res.status(500).json({ error: 'Internal Server Error' });
@@ -2010,16 +1980,162 @@ app.get('/customer/address', (req, res) => {
 
 
 
-/*************************************************************************************************************************************************************************
- ***********************************************************Phone Pay Integration**************************************************************************************************************
- */
+ /**************************************************************************Login********************************************************************************************************************************/ 
+ app.get('/shopkeeper', (req, res) => {
+  const phoneNumber = req.query.phoneNumber;
 
-const PHONE_PAY_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
-const MERCHANT_ID = "PGTESTPAYUAT";
-const SALT_INDEX = "1";
-const SALT_KEY = "	099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
+  if (!phoneNumber) {
+    return res.status(400).json({ error: 'Phone number is required' });
+  }
+
+  db.query(
+    'SELECT * FROM shopkeepers WHERE phoneNumber = ?',
+    [phoneNumber],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database query failed' });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Shopkeeper not found' });
+      }
+      res.json(results[0]);
+    }
+  );
+});
+
+// Fetch category data by name
+app.get('/category', (req, res) => {
+  const name = req.query.name;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Category name is required' });
+  }
+
+  db.query(
+    'SELECT * FROM category WHERE name = ?',
+    [name],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database query failed' });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Category not found' });
+      }
+      res.json(results[0]);
+    }
+  );
+});
+ 
+
+app.post('/login', (req, res) => {
+  const { phoneNumber, userType } = req.body;
+
+  // Validate the input
+  if (!phoneNumber || !userType) {
+    return res.status(400).json({ error: 'Phone number and user type are required' });
+  }
+
+  // Get the current date and time for login in YYYY-MM-DD HH:MM:SS format
+  const loginTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
+
+  // Check user type and handle login
+  if (userType === 'shopkeeper') {
+    // Fetch shopkeeper data
+    db.query(
+      'SELECT * FROM shopkeepers WHERE phoneNumber = ?',
+      [phoneNumber],
+      (err, results) => {
+        if (err) {
+          console.error('Error fetching shopkeeper data:', err);
+          return res.status(500).json({ error: 'Error fetching shopkeeper data' });
+        }
+        if (results.length === 0) {
+          return res.status(404).json({ error: 'Shopkeeper not found' });
+        }
+        const shopkeeperData = results[0];
+        const selectedCategory = shopkeeperData.selectedCategory;
+
+        // Fetch category data
+        db.query(
+          'SELECT * FROM category WHERE name = ?',
+          [selectedCategory],
+          (err, results) => {
+            if (err) {
+              console.error('Error fetching category data:', err);
+              return res.status(500).json({ error: 'Error fetching category data' });
+            }
+            if (results.length === 0) {
+              return res.status(404).json({ error: 'Category not found' });
+            }
+            const categoryData = results[0];
+            const shopkeeperType = categoryData.type;
+
+            // Log the login time
+            db.query(
+              'INSERT INTO tbl_login_history (phoneNumber, userType, loginTime) VALUES (?, ?, ?)',
+              [phoneNumber, userType, loginTime],
+              (err) => {
+                if (err) {
+                  console.error('Error inserting login history:', err);
+                }
+              }
+            );
+
+            res.json({ shopkeeperType, phoneNumber, userType });
+          }
+        );
+      }
+    );
+  } else if (userType === 'customer') {
+    // Log the login time for customer
+    db.query(
+      'INSERT INTO tbl_login_history (phoneNumber, userType, loginTime) VALUES (?, ?, ?)',
+      [phoneNumber, userType, loginTime],
+      (err) => {
+        if (err) {
+          console.error('Error inserting login history:', err);
+        }
+      }
+    );
+    res.json({ message: 'Login successful for customer', phoneNumber, userType });
+  } else if (userType === 'unregistered') {
+    // Log the login time for unregistered user
+    db.query(
+      'INSERT INTO tbl_login_history (phoneNumber, userType, loginTime) VALUES (?, ?, ?)',
+      [phoneNumber, userType, loginTime],
+      (err) => {
+        if (err) {
+          console.error('Error inserting login history:', err);
+        }
+      }
+    );
+    res.json({ message: 'Login successful for unregistered user', phoneNumber, userType });
+  } else {
+    res.status(400).json({ error: 'Invalid user type' });
+  }
+});
+
+
+// Logout endpoint
+app.post('/logout', (req, res) => {
+  const { userId } = req.body;
+
+  // Delete session from the database
+  db.query('DELETE FROM sessions WHERE user_id = ?', [userId], (err, result) => {
+    if (err) {
+      console.error('Error logging out:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    
+    console.log('Deleted session:', result); // Log the result of the database operation
+
+    res.status(200).json({ message: 'Logged out successfully' });
+  });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running at http://192.168.29.67:${PORT}/`);
 });
+
+//id, phoneNumber, shopkeeperName, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, shopBanner, profilePicture, registrationDate, selectedSubCategory, shopID, shopType, deliverToHome
