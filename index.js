@@ -2158,3 +2158,71 @@ app.listen(PORT, () => {
 });
 
 //id, phoneNumber, shopkeeperName, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, shopBanner, profilePicture, registrationDate, selectedSubCategory, shopID, shopType, deliverToHome
+
+
+
+
+/************************************************************Shopkeeper Orders************************************************************************************************************ */
+// server.js ya app.js
+app.get('/shopkeeperOrders/:shopkeeperPhoneNumber', (req, res) => {
+  const { shopkeeperPhoneNumber } = req.params;
+
+  // Query to fetch orders for the specific shopkeeper
+  const query = `
+    SELECT * FROM tbl_orders 
+    WHERE shopkeeperPhonenumber = ?
+    ORDER BY created_at DESC
+  `;
+
+  db.query(query, [shopkeeperPhoneNumber], (err, results) => {
+    if (err) {
+      console.error('Error fetching orders:', err);
+      return res.status(500).json({ error: 'Error fetching orders' });
+    }
+
+    res.json(results);
+  });
+});
+
+/************************************************************Shopkeeper Customers************************************************************************************************************ */
+app.get('/shopkeeperCustomerDetails/:shopkeeperPhoneNumber', (req, res) => {
+  const { shopkeeperPhoneNumber } = req.params;
+
+  const query = `
+    SELECT DISTINCT custPhoneNumber FROM tbl_orders 
+    WHERE shopkeeperPhonenumber = ?
+  `;
+
+  db.query(query, [shopkeeperPhoneNumber], (err, results) => {
+    if (err) {
+      console.error('Error fetching customer phone numbers:', err);
+      return res.status(500).json({ error: 'Error fetching customer phone numbers' });
+    }
+
+    res.json(results);
+  });
+});
+
+
+app.get('/shopkeeperCustomerDetails/:phoneNumber', (req, res) => {
+  const { phoneNumber } = req.params;
+
+  const query = `
+    SELECT * FROM newcustomers 
+    WHERE phoneNumber = ?
+  `;
+
+  db.query(query, [phoneNumber], (err, results) => {
+    if (err) {
+      console.error('Error fetching customer details:', err);
+      return res.status(500).json({ error: 'Error fetching customer details' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    res.json(results[0]);  // Return the first result from the query
+  });
+});
+
