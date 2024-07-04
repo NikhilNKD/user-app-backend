@@ -2038,7 +2038,6 @@ app.post('/login', (req, res) => {
   // Get the current date and time for login in YYYY-MM-DD HH:MM:SS format
   const loginTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
 
-  // Check user type and handle login
   if (userType === 'shopkeeper') {
     // Fetch shopkeeper data
     db.query(
@@ -2070,13 +2069,14 @@ app.post('/login', (req, res) => {
             const categoryData = results[0];
             const shopkeeperType = categoryData.type;
 
-            // Log the login time
+            // Log the login time for shopkeeper
             db.query(
-              'INSERT INTO tbl_login_history (phoneNumber, userType, loginTime) VALUES (?, ?, ?)',
-              [phoneNumber, userType, loginTime],
+              'INSERT INTO shopkeeper_login_history (phoneNumber, loginTime) VALUES (?, ?)',
+              [phoneNumber, loginTime],
               (err) => {
                 if (err) {
-                  console.error('Error inserting login history:', err);
+                  console.error('Error inserting shopkeeper login history:', err);
+                  return res.status(500).json({ error: 'Error inserting shopkeeper login history' });
                 }
               }
             );
@@ -2087,25 +2087,43 @@ app.post('/login', (req, res) => {
       }
     );
   } else if (userType === 'customer') {
-    // Log the login time for customer
+    // Fetch customer data
     db.query(
-      'INSERT INTO tbl_login_history (phoneNumber, userType, loginTime) VALUES (?, ?, ?)',
-      [phoneNumber, userType, loginTime],
-      (err) => {
+      'SELECT * FROM newcustomers WHERE phoneNumber = ?',
+      [phoneNumber],
+      (err, results) => {
         if (err) {
-          console.error('Error inserting login history:', err);
+          console.error('Error fetching customer data:', err);
+          return res.status(500).json({ error: 'Error fetching customer data' });
         }
+        if (results.length === 0) {
+          return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        // Log the login time for customer
+        db.query(
+          'INSERT INTO customer_login_history (phoneNumber, loginTime) VALUES (?, ?)',
+          [phoneNumber, loginTime],
+          (err) => {
+            if (err) {
+              console.error('Error inserting customer login history:', err);
+              return res.status(500).json({ error: 'Error inserting customer login history' });
+            }
+          }
+        );
+
+        res.json({ message: 'Login successful for customer', phoneNumber, userType });
       }
     );
-    res.json({ message: 'Login successful for customer', phoneNumber, userType });
   } else if (userType === 'unregistered') {
     // Log the login time for unregistered user
     db.query(
-      'INSERT INTO tbl_login_history (phoneNumber, userType, loginTime) VALUES (?, ?, ?)',
+      'INSERT INTO login_history (phoneNumber, userType, loginTime) VALUES (?, ?, ?)',
       [phoneNumber, userType, loginTime],
       (err) => {
         if (err) {
-          console.error('Error inserting login history:', err);
+          console.error('Error inserting login history for unregistered user:', err);
+          return res.status(500).json({ error: 'Error inserting login history for unregistered user' });
         }
       }
     );
@@ -2114,6 +2132,7 @@ app.post('/login', (req, res) => {
     res.status(400).json({ error: 'Invalid user type' });
   }
 });
+
 
 
 // Logout endpoint
