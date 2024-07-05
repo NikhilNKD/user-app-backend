@@ -1430,6 +1430,9 @@ async function updateCommissionAmount(mobileNumber, commissionType, commissionAm
   }
 
   try {
+      // Ensure commissionAmount is a valid number
+      const formattedCommissionAmount = parseFloat(commissionAmount).toFixed(2);
+      
       // Get the current commission amount for the specified mobile number and commission type
       const currentCommission = await new Promise((resolve, reject) => {
           db.query(
@@ -1442,13 +1445,13 @@ async function updateCommissionAmount(mobileNumber, commissionType, commissionAm
                       return;
                   }
                   console.log('Current commission:', result);
-                  resolve(result && result.length > 0 ? result[0].amount : 0);
+                  resolve(result && result.length > 0 ? parseFloat(result[0].amount) : 0);
               }
           );
       });
 
       // Calculate the new commission amount by adding the current commission amount and the new commission amount
-      const newCommissionAmount = currentCommission + commissionAmount;
+      const newCommissionAmount = (currentCommission + parseFloat(formattedCommissionAmount)).toFixed(2);
 
       // Update the commission amount in the database
       await new Promise((resolve, reject) => {
@@ -1472,7 +1475,6 @@ async function updateCommissionAmount(mobileNumber, commissionType, commissionAm
       throw new Error('Error updating commission amount');
   }
 }
-
 // Function to assign commission, either by updating an existing entry or inserting a new one
 async function assignCommission(mobileNumber, commissionType, commissionAmount) {
   console.log('Assigning commission for:', mobileNumber, commissionType, commissionAmount);
@@ -1482,6 +1484,9 @@ async function assignCommission(mobileNumber, commissionType, commissionAmount) 
   }
 
   try {
+      // Ensure commissionAmount is a valid number
+      const formattedCommissionAmount = parseFloat(commissionAmount).toFixed(2);
+      
       // Check if the commission entry already exists
       const existingCommission = await new Promise((resolve, reject) => {
           db.query(
@@ -1501,13 +1506,13 @@ async function assignCommission(mobileNumber, commissionType, commissionAmount) 
 
       // If the commission entry already exists, update the amount
       if (existingCommission && existingCommission.length > 0) {
-          await updateCommissionAmount(mobileNumber, commissionType, commissionAmount);
+          await updateCommissionAmount(mobileNumber, commissionType, formattedCommissionAmount);
       } else {
           // Insert commission details into the database
           await new Promise((resolve, reject) => {
               db.query(
                   'INSERT INTO tbl_commission (mobileNumber, commissionType, amount) VALUES (?, ?, ?)',
-                  [mobileNumber, commissionType, commissionAmount],
+                  [mobileNumber, commissionType, formattedCommissionAmount],
                   (err, result) => {
                       if (err) {
                           console.error('Error assigning commission:', err);
@@ -1519,19 +1524,41 @@ async function assignCommission(mobileNumber, commissionType, commissionAmount) 
               );
           });
 
-          console.log(`Inserted new commission for ${mobileNumber} of type ${commissionType} with amount ${commissionAmount}`);
+          console.log(`Inserted new commission for ${mobileNumber} of type ${commissionType} with amount ${formattedCommissionAmount}`);
       }
   } catch (error) {
       console.error('Error assigning commission:', error);
       throw new Error('Error assigning commission');
   }
 }
-
+ 
 // Function to check and assign commission based on the sales associate number
 async function checkAndAssignCommission(salesAssociateNumber) {
   console.log('Checking and assigning commission for sales associate:', salesAssociateNumber);
 
+  if (!salesAssociateNumber) {
+      console.log('No sales associate number provided, skipping commission assignment.');
+      return;
+  }
+
   try {
+      // Check if the sales associate number exists in the database
+      const salesAssociateResult = await new Promise((resolve, reject) => {
+          db.query('SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?', [salesAssociateNumber], (err, result) => {
+              if (err) {
+                  console.error('Error checking sales associate number:', err);
+                  reject(err);
+                  return;
+              }
+              resolve(result);
+          });
+      });
+
+      if (salesAssociateResult.length === 0) {
+          console.warn(`Sales associate number ${salesAssociateNumber} is not valid, no commission assigned.`);
+          return { error: `Sales associate number ${salesAssociateNumber} is not valid, no commission assigned.` };
+      }
+
       let addedBy = null;
 
       // Check if the sales associate was added by someone
@@ -1586,11 +1613,14 @@ async function checkAndAssignCommission(salesAssociateNumber) {
               console.warn(`No further addedBy found for ${addedBy}, skipping L2 commission assignment.`);
           }
       }
+
   } catch (error) {
       console.error('Error assigning commission:', error);
       throw new Error('Error assigning commission');
   }
 }
+
+
 
 // Register a shopkeeper and assign commission
 app.post('/shopkeeperRegister', upload.none(), async (req, res) => {
@@ -1710,8 +1740,10 @@ app.get('/myTotalCommission', async (req, res) => {
 });
 
 
-
-
+ //1472583698
+ //2580147096
+ //1111445236
+ //1112589635
 
 
 
