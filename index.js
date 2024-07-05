@@ -1623,6 +1623,7 @@ async function checkAndAssignCommission(salesAssociateNumber) {
 
 
 // Register a shopkeeper and assign commission
+// Register a shopkeeper and assign commission
 app.post('/shopkeeperRegister', upload.none(), async (req, res) => {
   const {
       phoneNumber,
@@ -1642,8 +1643,8 @@ app.post('/shopkeeperRegister', upload.none(), async (req, res) => {
       // Insert new shopkeeper into the database
       await new Promise((resolve, reject) => {
           db.query(
-              'INSERT INTO shopkeepers (phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory,deliverToHome) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)',
-              [phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory , deliverToHome],
+              'INSERT INTO shopkeepers (phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory, deliverToHome) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              [phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber || null, selectedCategory, selectedSubCategory, deliverToHome],
               (err, result) => {
                   if (err) {
                       console.error('Error registering shopkeeper:', err);
@@ -1655,8 +1656,17 @@ app.post('/shopkeeperRegister', upload.none(), async (req, res) => {
           );
       });
 
-      // Check if the sales associate was added by someone and assign commission
-      await checkAndAssignCommission(salesAssociateNumber);
+      // Check if the sales associate number is provided and valid
+      if (salesAssociateNumber) {
+          const isValidSalesAssociate = await checkSalesAssociateNumber(salesAssociateNumber);
+          if (isValidSalesAssociate) {
+              // Assign commission if the sales associate number is valid
+              await checkAndAssignCommission(salesAssociateNumber);
+          } else {
+              console.error('Invalid Sales Associate Number:', salesAssociateNumber);
+              return res.status(400).json({ message: 'Invalid Sales Associate Number' });
+          }
+      }
 
       res.status(200).json({ message: 'Shopkeeper registered successfully' });
   } catch (error) {
@@ -1664,7 +1674,7 @@ app.post('/shopkeeperRegister', upload.none(), async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
   }
 });
-
+;
 // Example route for checking sales associate number
 app.get('/checkSalesAssociate/:number', (req, res) => {
   const { number } = req.params;
@@ -1762,6 +1772,23 @@ app.get('/myTotalCommission', async (req, res) => {
   }
 });
 
+
+const checkSalesAssociateNumber = async (number) => {
+  try {
+      // Replace the URL with the correct endpoint to check sales associate validity
+      const response = await fetch(`http://192.168.29.67:3000/checkSalesAssociate/${number}`);
+      if (response.ok) {
+          const data = await response.json();
+          return data.exists; // Assume the API returns { exists: true/false }
+      } else {
+          console.error('Failed to check sales associate');
+          return false;
+      }
+  } catch (error) {
+      console.error('Error checking sales associate:', error);
+      return false;
+  }
+};
 
  //1472583698
  //2580147096
