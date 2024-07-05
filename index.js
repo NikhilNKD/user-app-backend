@@ -1665,6 +1665,29 @@ app.post('/shopkeeperRegister', upload.none(), async (req, res) => {
   }
 });
 
+// Example route for checking sales associate number
+app.get('/checkSalesAssociate/:number', (req, res) => {
+  const { number } = req.params;
+
+  // Check if the mobile number exists in the tbl_salesexecutives table
+  db.query('SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?', [number], (err, results) => {
+      if (err) {
+          console.error('Error checking sales associate existence:', err);
+          return res.status(500).json({ message: 'Internal server error' });
+      }
+
+      if (results.length > 0) {
+          // Mobile number exists in the tbl_salesexecutives database
+          return res.status(200).json({ exists: true });
+      } else {
+          // Mobile number doesn't exist in the tbl_salesexecutives database
+          return res.status(200).json({ exists: false });
+      }
+  });
+});
+
+//2587413690
+
 app.put('/updateProfile/:phoneNumber', (req, res) => {
   const { phoneNumber } = req.params;
   const {
@@ -1675,7 +1698,7 @@ app.put('/updateProfile/:phoneNumber', (req, res) => {
       address,
       salesAssociateNumber,
       selectedCategory
-  } = req.body;
+  } = req.body;s
 
   const query = `
       UPDATE nkd.shopkeepers
