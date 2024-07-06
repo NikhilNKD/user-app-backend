@@ -1,22 +1,31 @@
 import mysql from 'mysql2';
 import express from 'express';
-import bodyParser from 'body-parser'; // Assuming body-parser supports ES modules
+import bodyParser from 'body-parser';
 import crypto from 'crypto';
 import multer from 'multer';
 import cors from 'cors';
 import fs from 'fs';
-import 'reflect-metadata'; // Assuming reflect-metadata supports ES modules
+import 'reflect-metadata'; 
 import 'dotenv/config';
 import { AppDataSource } from './src/config/data-source.js';
 
 const app = express();
 
+console.log({
+  host:process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT
+
+})
+
 const db = mysql.createConnection({
  host:process.env.DB_HOST,
- user: process.env.DB_NAME,
+ user: process.env.DB_USER,
  password: process.env.DB_PASSWORD,
- database: "nkd",
- port: 21339,
+ database: process.env.DB_NAME,
+ port: process.env.DB_PORT,
  ssl: {
    rejectUnauthorized: true,
    ca: fs.readFileSync("ca-cert.pem"),
@@ -30,13 +39,13 @@ AppDataSource.initialize()
   })
   .catch((error) => console.log('Database connection error:', error));
 
-// db.connect((err) => {
-//     if (err) {
-//         console.error('Error connecting to the database:', err);
-//         return;
-//     }
-//     console.log('Connected to the database');
-// });
+db.connect((err) => {
+    if (err) {
+        console.error('Error connecting to the database:', err);
+        return;
+    }
+    console.log('Connected to the database');
+});
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
