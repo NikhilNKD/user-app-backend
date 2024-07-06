@@ -8,17 +8,9 @@ import fs from 'fs';
 import 'reflect-metadata'; 
 import 'dotenv/config';
 import { AppDataSource } from './src/config/data-source.js';
+import routes from './src/routes/index.js';
 
 const app = express();
-
-console.log({
-  host:process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT
-
-})
 
 const db = mysql.createConnection({
  host:process.env.DB_HOST,
@@ -64,21 +56,8 @@ const upload = multer({ storage: storage });
 
 app.use(bodyParser.json());
 
-// db.connect((err) => {
-//   if (err) {
-//     console.error("Error connecting to the database:", err);
-//     throw err;
-//   }
-//   // createTables.forEach((query) => {
-//   //   db.query(query, (err, result) => {
-//   //     if (err) {
-//   //       console.error("Error creating table:", err);
-//   //       return;
-//   //     }
-//   //     console.log("Table created successfully");
-//   //   });
-//   // });
-// });
+
+app.use('/api', routes);
 
 // to check weather the number is present in the which database
 app.post('/checkPhoneNumber', (req, res) => {
