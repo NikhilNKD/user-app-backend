@@ -1,37 +1,35 @@
-const mysql = require("mysql2");
-const express = require("express");
-const bodyParser = require("body-parser"); // Import body-parser
+import mysql from 'mysql2';
+import express from 'express';
+import bodyParser from 'body-parser';
+import crypto from 'crypto';
+import multer from 'multer';
+import cors from 'cors';
+import fs from 'fs';
+import 'reflect-metadata'; 
+import 'dotenv/config';
+import { AppDataSource } from './src/config/data-source.js';
+import routes from './src/routes/index.js';
+
 const app = express();
-const crypto = require("crypto");
-const multer = require("multer");
-const cors = require("cors");
-const fs = require("fs");
-const { createTables } = require("./db.schema");
-require("dotenv").config();
-
-console.log({
-  port: process.env.PORT,
-  db: process.env.DB_HOST,
-});
-
-//const db = mysql.createConnection({
-//  host:process.env.DB_HOST,
-//  user: process.env.DB_NAME,
-//  password: process.env.DB_PASSWORD,
-//  database: "nkd",
-//  port: 21339,
-//  ssl: {
-//    rejectUnauthorized: true,
-//    ca: fs.readFileSync("ca-cert.pem"),
-//  },
-//});
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+ host:process.env.DB_HOST,
+ user: process.env.DB_USER,
+ password: process.env.DB_PASSWORD,
+ database: process.env.DB_NAME,
+ port: process.env.DB_PORT,
+ ssl: {
+   rejectUnauthorized: true,
+   ca: fs.readFileSync("ca-cert.pem"),
+ },
 });
+
+
+AppDataSource.initialize()
+  .then(() => {
+    console.log('Database connected successfully using App Data Source');
+  })
+  .catch((error) => console.log('Database connection error:', error));
 
 db.connect((err) => {
     if (err) {
@@ -58,22 +56,8 @@ const upload = multer({ storage: storage });
 
 app.use(bodyParser.json());
 
-db.connect((err) => {
-  if (err) {
-    console.error("Error connecting to the database:", err);
-    throw err;
-  }
-  console.log("Connected to MySQL database");
-  // createTables.forEach((query) => {
-  //   db.query(query, (err, result) => {
-  //     if (err) {
-  //       console.error("Error creating table:", err);
-  //       return;
-  //     }
-  //     console.log("Table created successfully");
-  //   });
-  // });
-});
+
+app.use('/api', routes);
 
 // to check weather the number is present in the which database
 app.post('/checkPhoneNumber', (req, res) => {
@@ -159,7 +143,7 @@ function authenticateSession(req, res, next) {
   });
 }
 
-module.exports = { app, authenticateSession };
+export { app, authenticateSession };
 
 
 
@@ -1827,7 +1811,7 @@ const checkSalesAssociateNumber = async (number) => {
 
  
 
-
+//fetch my selected Products
 app.post('/selectedProducts', (req, res) => {
   const { phoneNumber, productId } = req.body;
   const query = 'INSERT INTO tbl_my_products (phoneNumber, productId) VALUES (?, ?)';
@@ -1840,7 +1824,7 @@ app.post('/selectedProducts', (req, res) => {
   });
 });
 
-
+//fetch the products accroding to category
 app.get('/products/:category', (req, res) => {
   const { category } = req.params;
   const query = 'SELECT id, main_category, product_name, brand_name, price, weight, picture_path FROM tbl_product_master WHERE type = ?';
@@ -1904,7 +1888,11 @@ app.delete('/deleteProduct', (req, res) => {
   });
 });
 
-// Assume you have a route to fetch products based on category
+
+
+
+
+// fetching products accroding to category 
 app.get('/products/:category', async (req, res) => {
   try {
       const { category } = req.params;
@@ -1947,9 +1935,10 @@ app.get('/products/:category', async (req, res) => {
 
 
 
-/**************************************************************************************************************************************************************
-*************************************************Preffered Shops*********************************************************************************************
+/****************************************************************Preffered Shops**************************************************************************************************
 */
+
+//add preferred shop
 app.post('/addPreferredShop', (req, res) => {
   const { customerPhoneNumber, shopID, shopkeeperName, phoneNumber, selectedCategory, shopType, pincode , deliverToHome } = req.body;
 
@@ -1964,7 +1953,7 @@ app.post('/addPreferredShop', (req, res) => {
 });
 
 
-
+//delete preferredshop
 app.delete('/removePreferredShop', (req, res) => {
   const { customerPhoneNumber, shopID } = req.body;
 
@@ -1978,7 +1967,7 @@ app.delete('/removePreferredShop', (req, res) => {
   });
 });
 
-
+//fetch preferred shop
 app.get('/api/preferred_shops/:phoneNumber', (req, res) => {
   const { phoneNumber } = req.params;
   const sql = 'SELECT * FROM preferred_shops WHERE customerPhoneNumber = ?';
@@ -1991,7 +1980,7 @@ app.get('/api/preferred_shops/:phoneNumber', (req, res) => {
     res.json(results);
   });
 });
-
+/***************************************************************************************************************************************************************************/
 
 app.post('/registerSales', upload.none(), async (req, res) => {
   const {
@@ -2307,4 +2296,3 @@ app.get('/shopkeeperCustomerDetails/:phoneNumber', (req, res) => {
     res.json(results[0]);  // Return the first result from the query
   });
 });
-

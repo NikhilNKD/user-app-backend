@@ -1,2 +1,7 @@
 node_modules
+<<<<<<< HEAD
 .env
+=======
+.env
+ca-cert.pem
+>>>>>>> e93b2b8b73fec33f08e3e33d514a28610c4b1650
