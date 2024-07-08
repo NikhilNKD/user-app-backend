@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const createTables = [
+=======
+export const createTables = [
+>>>>>>> e93b2b8b73fec33f08e3e33d514a28610c4b1650
   `CREATE TABLE IF NOT EXISTS category (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
@@ -133,6 +137,9 @@ const createTables = [
     );`,
 ];
 
+<<<<<<< HEAD
 module.exports = {
     createTables
 }
+=======
+>>>>>>> e93b2b8b73fec33f08e3e33d514a28610c4b1650
