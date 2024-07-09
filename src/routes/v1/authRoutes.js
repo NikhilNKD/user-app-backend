@@ -10,6 +10,6 @@ router.get('/', (req,res)=>{
 });
 router.post('/login', loginController);
 router.post('/register', registerController);
-router.post('/checkPhoneNumber', checkPhoneNumberController);
+router.post('/check-phone-number', checkPhoneNumberController);
 
 export default router;

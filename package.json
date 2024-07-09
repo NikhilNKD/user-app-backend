@@ -35,9 +35,9 @@
     "typeorm": "^0.3.20"
   },
   "devDependencies": {
-    "prettier": "^3.3.2",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1"
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^3.3.2"
   }
 }

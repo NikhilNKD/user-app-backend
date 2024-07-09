@@ -56,7 +56,6 @@ const upload = multer({ storage: storage });
 
 app.use(bodyParser.json());
 
-
 app.use('/api', routes);
 
 // to check weather the number is present in the which database
