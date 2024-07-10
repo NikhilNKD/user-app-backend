@@ -7,10 +7,9 @@ router.post('/generate-otp', generateOtpController);
 router.post('/validate-otp', validateOtpController);
 
 router.get('/', (req, res) => {
-    res.json({
-      message: 'Hi from v1 otp from inside',
-    });
+  res.json({
+    message: 'Hi from v1 otp from inside',
   });
-  
+});
 
 export default router;

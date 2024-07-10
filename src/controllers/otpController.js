@@ -2,14 +2,17 @@ import { generateOtp, validateOtp } from '../services/otpService.js';
 
 export const generateOtpController = async (req, res) => {
   try {
-    const { mobile } = req.body;
-    const result = await generateOtp(mobile);
-    res.json(result);
+    const { phoneNumber } = req.body;
+
+    if (!phoneNumber) {
+      return res.status(400).json({ message: 'Phone number is required' });
+    }
+
+    await generateOtp(phoneNumber);
+    res.json({ message: 'OTP sent successfully' });
   } catch (error) {
-    console.log("Error: ",error);
-    res
-      .status(500)
-      .json({ message: 'Internal server error', error: error.message });
+    console.error('Generate OTP Error:', error);
+    res.status(500).json({ message: 'An error occurred while generating the OTP', error: error.message });
   }
 };
 

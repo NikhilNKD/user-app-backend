@@ -16,6 +16,7 @@ import { TblMyProducts } from '../entities/TblMyProducts.js';
 import { ShopkeeperProducts } from '../entities/ShopkeeperProducts.js';
 import { PreferredShops } from '../entities/PreferredShops.js';
 import { TblSelectedServices } from '../entities/TblSelectedServices.js';
+import { Otp } from '../entities/Otp.js'; // Import the Otp entity
 
 export const AppDataSource = new DataSource({
     type: "mysql",
@@ -43,7 +44,8 @@ export const AppDataSource = new DataSource({
         TblMyProducts,
         ShopkeeperProducts,
         PreferredShops,
-        TblSelectedServices
+        TblSelectedServices,
+        Otp  
     ],
     migrations: [],
     subscribers: [],
