@@ -24,8 +24,12 @@ export const checkPhoneNumberController = async (req, res) => {
     try {
         const { phoneNumber } = req.body;
         const result = await checkPhoneNumberService(phoneNumber);
-        res.json(result);
+        if (result.message.includes('Phone number already exists')) {
+            return res.status(400).json(result);
+        }
+        return res.status(200).json(result);
     } catch (error) {
+        console.error('Error in checkPhoneNumberController:', error.message);
         res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };

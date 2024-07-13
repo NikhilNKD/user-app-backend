@@ -9,7 +9,7 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import { AppDataSource } from './src/config/data-source.js';
 import routes from './src/routes/index.js';
-
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 const db = mysql.createConnection({
@@ -23,7 +23,16 @@ const db = mysql.createConnection({
    ca: fs.readFileSync("ca-cert.pem"),
  },
 });
+ 
+app.use(cors({
+  origin: '*',  // Allow requests from any origin
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type,Authorization',
+}));
 
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
 
 AppDataSource.initialize()
   .then(() => {
@@ -53,8 +62,8 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
-app.use(bodyParser.json());
+ 
+app.use(bodyParser.json());  // To parse JSON bodies
 
 app.use('/api', routes);
 
@@ -1650,7 +1659,7 @@ app.post('/selectedProducts', (req, res) => {
 
  
 
-
+/***************************************************************Product Inventory******************************************************************************************************* */
 app.get('/products/:category', (req, res) => {
   const { category } = req.params;
   const query = 'SELECT id, main_category, product_name, brand_name, price, weight, picture_path FROM tbl_product_master WHERE type = ?';
@@ -1679,6 +1688,8 @@ app.post('/addProduct', (req, res) => {
       res.status(200).json({ message: 'Product added successfully' });
   });
 });
+
+/************************************************************************************************************************************************************************ */
 // Route to fetch shopkeeper's products
 app.get('/myProducts/:phoneNumber', (req, res) => {
   const { phoneNumber } = req.params;

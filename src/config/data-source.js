@@ -16,6 +16,12 @@ import { TblMyProducts } from '../entities/TblMyProducts.js';
 import { ShopkeeperProducts } from '../entities/ShopkeeperProducts.js';
 import { PreferredShops } from '../entities/PreferredShops.js';
 import { TblSelectedServices } from '../entities/TblSelectedServices.js';
+ 
+ 
+import dotenv from 'dotenv';
+
+
+dotenv.config();
 
 export const AppDataSource = new DataSource({
     type: "mysql",
@@ -32,7 +38,7 @@ export const AppDataSource = new DataSource({
         NewCustomer,
         Session,
         TblSalonMainServices,
-        TblSalonSubcategory,
+        TblSalonSubcategory, 
         TblSalonSubSubServices,
         TblOrders,
         TblSalesExecutives,
@@ -43,7 +49,9 @@ export const AppDataSource = new DataSource({
         TblMyProducts,
         ShopkeeperProducts,
         PreferredShops,
-        TblSelectedServices
+        TblSelectedServices,
+        
+      
     ],
     migrations: [],
     subscribers: [],

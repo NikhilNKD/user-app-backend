@@ -14,6 +14,9 @@ export const registerService = async (userData) => {
 };
 
 export const checkPhoneNumberService = async (phoneNumber) => {
-    const result = await checkPhoneNumberInDatabases(phoneNumber);
-    return result;
+    try {
+        return await checkPhoneNumberInDatabases(phoneNumber);
+    } catch (error) {
+        throw new Error('Error in checkPhoneNumberService: ' + error.message);
+    }
 };

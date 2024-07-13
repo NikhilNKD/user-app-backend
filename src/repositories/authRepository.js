@@ -26,11 +26,11 @@ export const checkPhoneNumberInDatabases = async (phoneNumber) => {
     const customer = await customerRepository.findOneBy({ phoneNumber });
     const shopkeeper = await shopkeeperRepository.findOneBy({ phoneNumber });
 
-    if (customer) {
-        return { message: 'Phone number already exists in customers database' };
-    }
     if (shopkeeper) {
         return { message: 'Phone number already exists in shopkeepers database' };
+    }
+    if (customer) {
+        return { message: 'Phone number already exists in newcustomers database' };
     }
     return { message: 'Phone number available' };
 };
