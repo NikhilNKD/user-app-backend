@@ -14,6 +14,10 @@ console.log({
   db: process.env.DB_HOST,
 });
 
+app.use(cors());
+ 
+app.use(bodyParser.urlencoded({ extended: true }));
+
 //const db = mysql.createConnection({
 //  host:process.env.DB_HOST,
 //  user: process.env.DB_NAME,
@@ -41,9 +45,14 @@ db.connect((err) => {
     console.log('Connected to the database');
 });
 
-const PORT = process.env.PORT || 3000;
+app.get('/', (req, res) => {
+  res.send('<h1>hello from backend nkd');
+});
+
+
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
-  console.log(`Server running at http://192.168.29.67:${PORT}/`);
+  console.log(`Server running at http://localhost:${PORT}/`);
 });
 
 const storage = multer.diskStorage({
@@ -119,61 +128,61 @@ app.post('/checkPhoneNumber', (req, res) => {
 
 /**************************************************Customer Registeration*************************************************************************************************************** */
 app.post('/register', (req, res) => {
-  const { phoneNumber, name, pincode, state, city, address, shopID, selectedCategory, selectedSubCategory, selectedCategoryType } = req.body;
+  const { phoneNumber, name, pincode, state, city, address, shopID } = req.body;
 
   // Check if user already exists
   db.query('SELECT * FROM newcustomers WHERE phoneNumber = ?', [phoneNumber], (err, results) => {
-      if (err) {
-          console.error('Error checking user existence:', err);
+    if (err) {
+      console.error('Error checking user existence:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    if (results.length > 0) {
+      return res.status(400).json({ message: 'Phone number already registered' });
+    }
+
+    // If shopID is provided
+    if (shopID) {
+      // Check if shopID exists in the shopkeepers database as a phoneNumber
+      db.query('SELECT * FROM shopkeepers WHERE phoneNumber = ?', [shopID], (err, shopkeeperResults) => {
+        if (err) {
+          console.error('Error checking shopkeeper existence:', err);
           return res.status(500).json({ message: 'Internal server error' });
-      }
-      if (results.length > 0) {
-          return res.status(400).json({ message: 'Phone number already registered' });
-      }
+        }
 
-      // If shopID is provided
-      if (shopID) {
-          // Check if shopID exists in shopkeepers database
-          db.query('SELECT * FROM shopkeepers WHERE shopID = ?', [shopID], (err, shopkeeperResults) => {
-              if (err) {
-                  console.error('Error checking shopkeeper existence:', err);
-                  return res.status(500).json({ message: 'Internal server error' });
-              }
+        if (shopkeeperResults.length > 0) {
+          // Shopkeeper exists with the provided shopID as phoneNumber
+          const shopkeeper = shopkeeperResults[0];
 
-              if (shopkeeperResults.length > 0) {
-                  // Shopkeeper exists with the provided shopID
-                  const shopkeeper = shopkeeperResults[0];
-
-                  // Add the user to newcustomers database with shopID
-                  db.query('INSERT INTO newcustomers (phoneNumber, name, pincode, state, city, address, shop_id, selectedCategory, selectedSubCategory, selectedCategoryType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-                  [phoneNumber, name, pincode, state, city, address, shopID, selectedCategory, selectedSubCategory, selectedCategoryType], 
-                  (err, result) => {
-                      if (err) {
-                          console.error('Error registering user:', err);
-                          return res.status(500).json({ message: 'Internal server error' });
-                      }
-                      console.log('User registered successfully');
-                      return res.status(200).json({ message: 'User registered successfully', shopType: shopkeeper.selectedCategory });
-                  });
-              } else {
-                  // Shopkeeper not found with the provided shopID
-                  console.log('Shopkeeper not found');
-                  return res.status(404).json({ message: 'Shopkeeper not found' });
-              }
-          });
-      } else {
-          // If shopID is not provided, register the user without associating it with any shop
-          db.query('INSERT INTO newcustomers (phoneNumber, name, pincode, state, city, address) VALUES (?, ?, ?, ?, ?, ?)', 
-          [phoneNumber, name, pincode, state, city, address], 
+          // Add the user to newcustomers database with shopID
+          db.query('INSERT INTO newcustomers (phoneNumber, name, shop_id, pincode, state, city, address) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+          [phoneNumber, name, shopID, pincode, state, city, address], 
           (err, result) => {
-              if (err) {
-                  console.error('Error registering user:', err);
-                  return res.status(500).json({ message: 'Internal server error' });
-              }
-              console.log('User registered successfully');
-              return res.status(200).json({ message: 'User registered successfully', userId: result.insertId });
+            if (err) {
+              console.error('Error registering user:', err);
+              return res.status(500).json({ message: 'Internal server error' });
+            }
+            console.log('User registered successfully');
+            return res.status(200).json({ message: 'User registered successfully', shopType: shopkeeper.selectedCategory });
           });
-      }
+        } else {
+          // Shopkeeper not found with the provided shopID
+          console.log('Shopkeeper not found');
+          return res.status(404).json({ message: 'ShopID not found' });
+        }
+      });
+    } else {
+      // If shopID is not provided, register the user without associating it with any shop
+      db.query('INSERT INTO newcustomers (phoneNumber, name, pincode, state, city, address) VALUES (?, ?, ?, ?, ?, ?)', 
+      [phoneNumber, name, pincode, state, city, address], 
+      (err, result) => {
+        if (err) {
+          console.error('Error registering user:', err);
+          return res.status(500).json({ message: 'Internal server error' });
+        }
+        console.log('User registered successfully');
+        return res.status(200).json({ message: 'User registered successfully', userId: result.insertId });
+      });
+    }
   });
 });
 
@@ -476,17 +485,17 @@ app.get('/shopkeeperDetails', async (req, res) => {
 
 app.get('/shopkeeperServiceDetails/:phoneNumber', (req, res) => {
   const { phoneNumber } = req.params;
-  const query = 'SELECT shopkeeperName, selectedSubCategory FROM shopkeepers WHERE phoneNumber = ?';
+  const query = 'SELECT shopID, shopkeeperName, selectedSubCategory FROM shopkeepers WHERE phoneNumber = ?';
 
   db.query(query, [phoneNumber], (err, results) => {
-      if (err) {
-          console.error('Error fetching shopkeeper details:', err);
-          res.status(500).json({ error: 'Failed to fetch shopkeeper details' });
-      } else if (results.length === 0) {
-          res.status(404).json({ error: 'Shopkeeper not found' });
-      } else {
-          res.json(results[0]);
-      }
+    if (err) {
+      console.error('Error fetching shopkeeper details:', err);
+      res.status(500).json({ error: 'Failed to fetch shopkeeper details' });
+    } else if (results.length === 0) {
+      res.status(404).json({ error: 'Shopkeeper not found' });
+    } else {
+      res.json(results[0]);
+    }
   });
 });
 
@@ -1419,7 +1428,7 @@ app.delete('/removePreferredShop', (req, res) => {
 });
 
 
-app.get('/api/preferred_shops/:phoneNumber', (req, res) => {
+app.get('/preferred_shops/:phoneNumber', (req, res) => {
   const { phoneNumber } = req.params;
   const sql = 'SELECT * FROM preferred_shops WHERE customerPhoneNumber = ?';
   db.query(sql, [phoneNumber], (err, results) => {
@@ -1431,6 +1440,8 @@ app.get('/api/preferred_shops/:phoneNumber', (req, res) => {
     res.json(results);
   });
 });
+
+
 
 
 
@@ -2012,3 +2023,10 @@ app.get('/shopkeeper/selectedSubServices/:shopPhoneNumber/:mainServiceId', (req,
       }
   });
 });
+
+
+
+
+
+/**********************************************************New api********************************************************************************************* */
+
