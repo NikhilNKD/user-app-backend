@@ -1,7 +1,8 @@
 import { EntitySchema } from 'typeorm';
+import { TblProductMaster } from './TblProductMaster.js'; // Ensure this path is correct
 
 export const ShopkeeperProducts = new EntitySchema({
-  name: 'ShopkeeperProducts',
+  name: 'ShopkeeperProduct',
   tableName: 'shopkeeper_products',
   columns: {
     id: {
@@ -15,6 +16,15 @@ export const ShopkeeperProducts = new EntitySchema({
     },
     productId: {
       type: 'int',
+    },
+  },
+  relations: {
+    product: {
+      target: TblProductMaster,
+      type: 'many-to-one',
+      joinColumn: { name: 'productId' },
+      inverseSide: 'id',
+      onDelete: 'CASCADE',
     },
   },
 });
