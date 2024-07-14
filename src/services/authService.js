@@ -1,12 +1,33 @@
 import { findUserByPhoneNumber, saveUser, checkPhoneNumberInDatabases } from '../repositories/authRepository.js';
 
+ 
+import { Category } from '../entities/Category.js';
+
 export const loginService = async (phoneNumber, userType) => {
     const user = await findUserByPhoneNumber(phoneNumber, userType);
     if (!user) {
         throw new Error('User not found');
     }
-    return user;
+
+    if (userType === 'shopkeeper') {
+        const selectedCategory = user.selectedCategory;
+
+        // Fetch category details
+        const categoryRepository = AppDataSource.getRepository(Category);
+        const category = await categoryRepository.findOneBy({ name: selectedCategory });
+
+        if (!category) {
+            throw new Error('Category not found');
+        }
+
+        const shopkeeperType = category.type;
+
+        return { phoneNumber, userType, shopkeeperType, selectedCategory };
+    }
+
+    return { phoneNumber, userType };
 };
+
 
 export const registerService = async (userData) => {
     const user = await saveUser(userData);

@@ -1,4 +1,43 @@
-import { createCategoriesService, getAllCategories, getSubCategoriesByCategoryId, createSubCategoryService } from '../services/categoryService.js';
+import { createCategoriesService, getAllCategories, getSubCategoriesByCategoryId, createSubCategoryService, getCategoryByName } from '../services/categoryService.js';
+
+
+
+export const fetchCategoryByName = async (req, res) => {
+    const { name } = req.query;
+
+    if (!name) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'Category name is required',
+        });
+    }
+
+    try {
+        const category = await getCategoryByName(name);  // Fetch category by name
+        if (category) {
+            res.status(200).json({
+                success: true,
+                data: category,
+                message: 'Category fetched successfully',
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                data: null,
+                message: 'Category not found',
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            data: null,
+            message: 'Internal server error',
+            error: error.message,
+        });
+    }
+};
+
 
 export const createCategories = async (req, res) => {
     try {

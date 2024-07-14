@@ -3,10 +3,10 @@ import { loginController, registerController, checkPhoneNumberController } from 
 
 const router = Router();
 
-router.get('/', (req,res)=>{
+router.get('/', (req, res) => {
     res.json({
-        message:'Hi from v1 auth from inside'
-    })
+        message: 'Hi from v1 auth from inside'
+    });
 });
 router.post('/login', loginController);
 router.post('/register', registerController);

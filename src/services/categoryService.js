@@ -24,3 +24,7 @@ export const createSubCategoryService = async (data) => {
   const newSubCategory = subCategoryRepo.create(data);
   return await subCategoryRepo.save(newSubCategory);
 };
+export const getCategoryByName = async (name) => {
+  const categoryRepo = AppDataSource.getRepository(Category);
+  return await categoryRepo.findOne({ where: { name } });
+};
