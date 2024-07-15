@@ -31,20 +31,21 @@ export const getOrdersService = async (custPhoneNumber) => {
 };
 
 export const getCustomerOrdersService = async (custPhoneNumber) => {
-  try {
-    return await getCustomerOrdersRepository(custPhoneNumber);
-  } catch (error) {
-    throw new Error('Error in getCustomerOrdersService: ' + error.message);
-  }
-};
+	try {
+	  return await getCustomerOrdersRepository(custPhoneNumber);
+	} catch (error) {
+	  throw new Error('Error in getCustomerOrdersService: ' + error.message);
+	}
+  };
 
-export const getOrderDetailsService = async (shopID, custPhoneNumber) => {
-  try {
-    return await getOrderDetailsRepository(shopID, custPhoneNumber);
-  } catch (error) {
-    throw new Error('Error in getOrderDetailsService: ' + error.message);
-  }
-};
+  export const getOrderDetailsService = async (shopID, custPhoneNumber) => {
+	try {
+	  return await getOrderDetailsRepository(shopID, custPhoneNumber);  // Call repository
+	} catch (error) {
+	  throw new Error('Error in getOrderDetailsService: ' + error.message);  // Handle error
+	}
+  };
+  
 
 export const getCustomerStoresService = async (custPhoneNumber) => {
   try {

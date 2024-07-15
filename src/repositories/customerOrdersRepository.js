@@ -55,33 +55,32 @@ export const getOrdersRepository = async (custPhoneNumber) => {
 };
 
 export const getCustomerOrdersRepository = async (custPhoneNumber) => {
-  try {
-    const orderRepository = AppDataSource.getRepository(TblOrders);
-    const orders = await orderRepository.find({
-      where: { custPhoneNumber },
-      order: { created_at: 'DESC' },
-    });
-    return { success: true, orders };
-  } catch (error) {
-    throw new Error('Error in getCustomerOrdersRepository: ' + error.message);
-  }
-};
+	try {
+	  const orderRepository = AppDataSource.getRepository(TblOrders);
+	  const orders = await orderRepository.find({
+		where: { custPhoneNumber },
+		order: { created_at: 'DESC' },  // Make sure to order by date
+	  });
+	  return { success: true, orders };
+	} catch (error) {
+	  throw new Error('Error in getCustomerOrdersRepository: ' + error.message);
+	}
+  };
 
-export const getOrderDetailsRepository = async (shopID, custPhoneNumber) => {
-  try {
-    const orderRepository = AppDataSource.getRepository(TblOrders);
-    const orders = await orderRepository.find({
-      where: { custPhoneNumber, shopID },
-      order: { created_at: 'DESC' },
-    });
-    return { success: true, orders: orders.map(order => ({
-      ...order,
-      cartItems: JSON.parse(order.cartItems)
-    })) };
-  } catch (error) {
-    throw new Error('Error in getOrderDetailsRepository: ' + error.message);
-  }
-};
+  export const getOrderDetailsRepository = async (shopID, custPhoneNumber) => {
+	try {
+	  const orderRepository = AppDataSource.getRepository(TblOrders);
+	  const orders = await orderRepository.find({
+		where: { shopID, custPhoneNumber },
+		order: { created_at: 'DESC' },
+	  });
+	  return orders;  // Return orders
+	} catch (error) {
+	  throw new Error('Error in getOrderDetailsRepository: ' + error.message);  // Handle error
+	}
+  };
+  
+  
 
 export const getCustomerStoresRepository = async (custPhoneNumber) => {
   try {

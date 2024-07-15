@@ -51,8 +51,11 @@ import {
   
   export const getCustomerOrdersController = async (req, res) => {
 	try {
-	  const { custPhoneNumber } = req.query;
-	  const result = await getCustomerOrdersService(custPhoneNumber);
+	  const { phoneNumber } = req.params;  // Extract from route params
+	  if (!phoneNumber) {
+		return res.status(400).json({ success: false, message: 'Phone number is required' });
+	  }
+	  const result = await getCustomerOrdersService(phoneNumber);  // Pass to service
 	  res.json(result);
 	} catch (error) {
 	  console.error('Error in getCustomerOrdersController:', error);
@@ -61,15 +64,17 @@ import {
   };
   
   export const getOrderDetailsController = async (req, res) => {
+	const { shopID, custPhoneNumber } = req.params;  // Extract parameters from route params
+  
 	try {
-	  const { shopID, custPhoneNumber } = req.query;
-	  const result = await getOrderDetailsService(shopID, custPhoneNumber);
-	  res.json(result);
+	  const orders = await getOrderDetailsService(shopID, custPhoneNumber);  // Call service
+	  res.status(200).json({ success: true, orders });  // Send JSON response
 	} catch (error) {
 	  console.error('Error in getOrderDetailsController:', error);
-	  res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+	  res.status(500).json({ success: false, message: 'Failed to fetch order details.', error: error.message });  // Handle error
 	}
   };
+  
   
   export const getCustomerStoresController = async (req, res) => {
 	try {

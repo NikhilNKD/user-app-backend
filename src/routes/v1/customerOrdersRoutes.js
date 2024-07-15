@@ -15,8 +15,8 @@ const router = Router();
 router.post('/saveOrder', saveOrderController);
 router.post('/placeOrder', placeOrderController);
 router.get('/getOrders', getOrdersController);
-router.get('/getCustomerOrders', getCustomerOrdersController);
-router.get('/getOrderDetails', getOrderDetailsController);
+router.get('/getCustomerOrder/:phoneNumber', getCustomerOrdersController);
+router.get('/getOrderDetails/:shopID/:custPhoneNumber', getOrderDetailsController); 
 router.get('/getCustomerStores', getCustomerStoresController);
 
 export default router;
