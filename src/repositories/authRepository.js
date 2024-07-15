@@ -21,6 +21,18 @@ export const saveUser = async (userData) => {
     }
 };
 
+export const saveCustomer = async (userData) => {
+    try {
+        const repository = AppDataSource.getRepository(NewCustomer);
+        const customer = repository.create(userData);
+        await repository.save(customer);
+        return customer;
+    } catch (error) {
+        console.error('Error in saveCustomer:', error);
+        throw new Error('Error saving customer: ' + error.message);
+    }
+};
+
 export const checkPhoneNumberInDatabases = async (phoneNumber) => {
     const customerRepository = AppDataSource.getRepository(NewCustomer);
     const shopkeeperRepository = AppDataSource.getRepository(Shopkeeper);
