@@ -19,6 +19,6 @@ router.get('/detailsByShopID', getShopkeeperDetailsByShopIDController);
 router.get('/service/:phoneNumber', getShopkeeperServiceDetailsController);
 
 // Route to get shopkeeper product home details
-router.get('/productHome/:phoneNumber', getShopkeeperProductHomeDetailsController);
+router.get('/productHome/:phoneNumber', getShopkeeperProductHomeDetailsController); 
 
 export default router;

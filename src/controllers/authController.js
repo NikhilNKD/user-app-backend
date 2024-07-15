@@ -14,12 +14,12 @@ export const registerController = async (req, res) => {
     try {
         const userData = req.body;
         const result = await registerService(userData);
-        res.json(result);
+        res.json({ success: true, data: result, message: 'User registered successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error', error: error.message });
+        console.error('Error in registerController:', error);
+        res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
     }
 };
-
 export const checkPhoneNumberController = async (req, res) => {
     try {
         const { phoneNumber } = req.body;

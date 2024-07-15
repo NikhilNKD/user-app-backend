@@ -94,6 +94,7 @@ export const getShopkeeperProductHomeDetailsByPhoneNumberService = async (phoneN
             message: 'Shopkeeper product home details not found',
         };
     } catch (error) {
+        console.error('Service Error:', error);  // Debugging statement
         throw new Error('Error fetching shopkeeper product home details: ' + error.message);
     }
 };

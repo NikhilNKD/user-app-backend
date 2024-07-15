@@ -23,7 +23,6 @@ export const getShopkeeperServiceDetailsByPhoneNumber = async (phoneNumber) => {
     });
 };
 
-// Get shopkeeper product home details by phone number
 export const getShopkeeperProductHomeDetailsByPhoneNumber = async (phoneNumber) => {
     const shopkeeperRepo = AppDataSource.getRepository(Shopkeeper);
     return await shopkeeperRepo.findOne({

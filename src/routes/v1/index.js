@@ -17,4 +17,5 @@ router.use('/customer', customerRoutes);
 router.use('/shopkeeper', shopkeeperDetailsRoutes);
 router.use('/pincode', pincodeRoutes); // Use the pincode routes
 router.use('/preferredShops', preferredShopRoutes);
+router.use('/shopkeeperDetails', shopkeeperDetailsRoutes); 
 export default router;

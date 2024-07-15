@@ -57,9 +57,12 @@ export const getShopkeeperServiceDetailsController = async (req, res) => {
 export const getShopkeeperProductHomeDetailsController = async (req, res) => {
     try {
         const { phoneNumber } = req.params;
+        console.log(`Received phoneNumber: ${phoneNumber}`);  // Debugging statement
         const result = await getShopkeeperProductHomeDetailsByPhoneNumberService(phoneNumber);
+        console.log('Service Result:', result);  // Debugging statement
         res.status(result.status).json(result);
     } catch (error) {
+        console.error('Controller Error:', error);  // Debugging statement
         res.status(500).json({
             success: false,
             data: null,

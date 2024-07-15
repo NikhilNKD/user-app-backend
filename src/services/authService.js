@@ -28,12 +28,14 @@ export const loginService = async (phoneNumber, userType) => {
     return { phoneNumber, userType };
 };
 
-
 export const registerService = async (userData) => {
-    const user = await saveUser(userData);
-    return user;
+    try {
+        const user = await saveUser(userData);
+        return user;
+    } catch (error) {
+        throw new Error('Error in registerService: ' + error.message);
+    }
 };
-
 export const checkPhoneNumberService = async (phoneNumber) => {
     try {
         return await checkPhoneNumberInDatabases(phoneNumber);

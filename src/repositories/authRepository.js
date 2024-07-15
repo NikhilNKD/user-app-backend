@@ -9,14 +9,16 @@ export const findUserByPhoneNumber = async (phoneNumber, userType) => {
     const user = await repository.findOneBy({ phoneNumber });
     return user;
 };
-
 export const saveUser = async (userData) => {
-    const repository = userData.userType === 'shopkeeper'
-        ? AppDataSource.getRepository(Shopkeeper)
-        : AppDataSource.getRepository(NewCustomer);
-    const user = repository.create(userData);
-    await repository.save(user);
-    return user;
+    try {
+        const repository = AppDataSource.getRepository(Shopkeeper);
+        const user = repository.create(userData);
+        await repository.save(user);
+        return user;
+    } catch (error) {
+        console.error('Error in saveUser:', error);
+        throw new Error('Error saving user: ' + error.message);
+    }
 };
 
 export const checkPhoneNumberInDatabases = async (phoneNumber) => {
