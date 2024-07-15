@@ -9,6 +9,9 @@ import preferredShopRoutes from './preferredShopRoutes.js'; // Import the shopke
 import pincodeRoutes from "./pincodeRoutes.js";
 import shopkeeperProductsRoutes from './shopkeeperProductsRoutes.js'; 
 import customerOrdersRoutes from "./customerOrdersRoutes.js"
+import customerAddressRoutes from "./customerAddressRoutes.js";
+import salesExecutiveRoutes from "./salesExecutiveRoutes.js"
+ 
 const router = Router();
 
 router.use('/auth', authRoutes);
@@ -22,4 +25,8 @@ router.use('/preferredShops', preferredShopRoutes);
 router.use('/shopkeeperDetails', shopkeeperDetailsRoutes); 
 router.use('/shopkeeperProducts', shopkeeperProductsRoutes);
 router.use('/customerOrders', customerOrdersRoutes);
+router.use('/customerAddress', customerAddressRoutes);
+router.use('/sales', salesExecutiveRoutes);
+ 
+
 export default router;
