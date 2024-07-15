@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 // Route to get shopkeeper details by phone number
-router.get('/details', getShopkeeperDetailsByPhoneNumberController);
+router.get('/details/:phoneNumber', getShopkeeperDetailsByPhoneNumberController);
 
 // Route to get shopkeeper details by shop ID
 router.get('/detailsByShopID', getShopkeeperDetailsByShopIDController);
