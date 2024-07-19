@@ -716,659 +716,659 @@ app.use('/api', routes);
 
 /////****************************************Sales Executive module api ************************************************************************************************* */
 
-////const checkSalesAssociateNumber = async (number) => {
-////  try {
-////      // Replace the URL with the correct endpoint to check sales associate validity
-////      const response = await fetch(`http://192.168.29.67:3000/checkSalesAssociate/${number}`);
-////      if (response.ok) {
-////          const data = await response.json();
-////          return data.exists; // Assume the API returns { exists: true/false }
-////      } else {
-////          console.error('Failed to check sales associate');
-////          return false;
-////      }
-////  } catch (error) {
-////      console.error('Error checking sales associate:', error);
-////      return false;
-////  }
-////};
+const checkSalesAssociateNumber = async (number) => {
+  try {
+      // Replace the URL with the correct endpoint to check sales associate validity
+      const response = await fetch(`http://192.168.29.67:3000/checkSalesAssociate/${number}`);
+      if (response.ok) {
+          const data = await response.json();
+          return data.exists; // Assume the API returns { exists: true/false }
+      } else {
+          console.error('Failed to check sales associate');
+          return false;
+      }
+  } catch (error) {
+      console.error('Error checking sales associate:', error);
+      return false;
+  }
+};
 
 
-//////function to fetch commissionRates form the comission_rates table
-////async function fetchCommissionRates() {
-////  try {
-////      const commissionRates = await new Promise((resolve, reject) => {
-////          db.query('SELECT * FROM commission_rates', (err, result) => {
-////              if (err) {
-////                  console.error('Error fetching commission rates:', err);
-////                  reject(err);
-////                  return;
-////              }
-////              resolve(result.reduce((acc, cur) => ({ ...acc, [cur.commissionType]: cur.amount }), {}));
-////          });
-////      });
-////      return commissionRates;
-////  } catch (error) {
-////      console.error('Error fetching commission rates:', error);
-////      throw new Error('Error fetching commission rates');
-////  }
-////}
+//function to fetch commissionRates form the comission_rates table
+async function fetchCommissionRates() {
+  try {
+      const commissionRates = await new Promise((resolve, reject) => {
+          db.query('SELECT * FROM commission_rates', (err, result) => {
+              if (err) {
+                  console.error('Error fetching commission rates:', err);
+                  reject(err);
+                  return;
+              }
+              resolve(result.reduce((acc, cur) => ({ ...acc, [cur.commissionType]: cur.amount }), {}));
+          });
+      });
+      return commissionRates;
+  } catch (error) {
+      console.error('Error fetching commission rates:', error);
+      throw new Error('Error fetching commission rates');
+  }
+}
 
 
 
 
-////// Function to update commission amount for an existing entry
-////async function updateCommissionAmount(mobileNumber, commissionType, commissionAmount) {
-////  console.log('Updating commission for:', mobileNumber, commissionType, commissionAmount);
+// Function to update commission amount for an existing entry
+async function updateCommissionAmount(mobileNumber, commissionType, commissionAmount) {
+  console.log('Updating commission for:', mobileNumber, commissionType, commissionAmount);
 
-////  if (!mobileNumber) {
-////      throw new Error('mobileNumber is null or undefined');
-////  }
+  if (!mobileNumber) {
+      throw new Error('mobileNumber is null or undefined');
+  }
 
-////  try {
-////      // Ensure commissionAmount is a valid number
-////      const formattedCommissionAmount = parseFloat(commissionAmount).toFixed(2);
+  try {
+      // Ensure commissionAmount is a valid number
+      const formattedCommissionAmount = parseFloat(commissionAmount).toFixed(2);
       
-////      // Get the current commission amount for the specified mobile number and commission type
-////      const currentCommission = await new Promise((resolve, reject) => {
-////          db.query(
-////              'SELECT amount FROM tbl_commission WHERE mobileNumber = ? AND commissionType = ?',
-////              [mobileNumber, commissionType],
-////              (err, result) => {
-////                  if (err) {
-////                      console.error('Error fetching current commission amount:', err);
-////                      reject(err);
-////                      return;
-////                  }
-////                  console.log('Current commission:', result);
-////                  resolve(result && result.length > 0 ? parseFloat(result[0].amount) : 0);
-////              }
-////          );
-////      });
+      // Get the current commission amount for the specified mobile number and commission type
+      const currentCommission = await new Promise((resolve, reject) => {
+          db.query(
+              'SELECT amount FROM tbl_commission WHERE mobileNumber = ? AND commissionType = ?',
+              [mobileNumber, commissionType],
+              (err, result) => {
+                  if (err) {
+                      console.error('Error fetching current commission amount:', err);
+                      reject(err);
+                      return;
+                  }
+                  console.log('Current commission:', result);
+                  resolve(result && result.length > 0 ? parseFloat(result[0].amount) : 0);
+              }
+          );
+      });
 
-////      // Calculate the new commission amount by adding the current commission amount and the new commission amount
-////      const newCommissionAmount = (currentCommission + parseFloat(formattedCommissionAmount)).toFixed(2);
+      // Calculate the new commission amount by adding the current commission amount and the new commission amount
+      const newCommissionAmount = (currentCommission + parseFloat(formattedCommissionAmount)).toFixed(2);
 
-////      // Update the commission amount in the database
-////      await new Promise((resolve, reject) => {
-////          db.query(
-////              'UPDATE tbl_commission SET amount = ? WHERE mobileNumber = ? AND commissionType = ?',
-////              [newCommissionAmount, mobileNumber, commissionType],
-////              (err, result) => {
-////                  if (err) {
-////                      console.error('Error updating commission amount:', err);
-////                      reject(err);
-////                      return;
-////                  }
-////                  resolve(result);
-////              }
-////          );
-////      });
+      // Update the commission amount in the database
+      await new Promise((resolve, reject) => {
+          db.query(
+              'UPDATE tbl_commission SET amount = ? WHERE mobileNumber = ? AND commissionType = ?',
+              [newCommissionAmount, mobileNumber, commissionType],
+              (err, result) => {
+                  if (err) {
+                      console.error('Error updating commission amount:', err);
+                      reject(err);
+                      return;
+                  }
+                  resolve(result);
+              }
+          );
+      });
 
-////      console.log(`Updated commission for ${mobileNumber} of type ${commissionType} to ${newCommissionAmount}`);
-////  } catch (error) {
-////      console.error('Error updating commission amount:', error);
-////      throw new Error('Error updating commission amount');
-////  }
-////}
-
-
+      console.log(`Updated commission for ${mobileNumber} of type ${commissionType} to ${newCommissionAmount}`);
+  } catch (error) {
+      console.error('Error updating commission amount:', error);
+      throw new Error('Error updating commission amount');
+  }
+}
 
 
-////// Function to assign commission, either by updating an existing entry or inserting a new one
-////async function assignCommission(mobileNumber, commissionType, commissionAmount) {
-////  console.log('Assigning commission for:', mobileNumber, commissionType, commissionAmount);
 
-////  if (!mobileNumber) {
-////      throw new Error('mobileNumber is null or undefined');
-////  }
 
-////  try {
-////      // Ensure commissionAmount is a valid number
-////      const formattedCommissionAmount = parseFloat(commissionAmount).toFixed(2);
+// Function to assign commission, either by updating an existing entry or inserting a new one
+async function assignCommission(mobileNumber, commissionType, commissionAmount) {
+  console.log('Assigning commission for:', mobileNumber, commissionType, commissionAmount);
+
+  if (!mobileNumber) {
+      throw new Error('mobileNumber is null or undefined');
+  }
+
+  try {
+      // Ensure commissionAmount is a valid number
+      const formattedCommissionAmount = parseFloat(commissionAmount).toFixed(2);
       
-////      // Check if the commission entry already exists
-////      const existingCommission = await new Promise((resolve, reject) => {
-////          db.query(
-////              'SELECT * FROM tbl_commission WHERE mobileNumber = ? AND commissionType = ?',
-////              [mobileNumber, commissionType],
-////              (err, result) => {
-////                  if (err) {
-////                      console.error('Error checking existing commission:', err);
-////                      reject(err);
-////                      return;
-////                  }
-////                  console.log('Existing commission:', result);
-////                  resolve(result);
-////              }
-////          );
-////      });
+      // Check if the commission entry already exists
+      const existingCommission = await new Promise((resolve, reject) => {
+          db.query(
+              'SELECT * FROM tbl_commission WHERE mobileNumber = ? AND commissionType = ?',
+              [mobileNumber, commissionType],
+              (err, result) => {
+                  if (err) {
+                      console.error('Error checking existing commission:', err);
+                      reject(err);
+                      return;
+                  }
+                  console.log('Existing commission:', result);
+                  resolve(result);
+              }
+          );
+      });
 
-////      // If the commission entry already exists, update the amount
-////      if (existingCommission && existingCommission.length > 0) {
-////          await updateCommissionAmount(mobileNumber, commissionType, formattedCommissionAmount);
-////      } else {
-////          // Insert commission details into the database
-////          await new Promise((resolve, reject) => {
-////              db.query(
-////                  'INSERT INTO tbl_commission (mobileNumber, commissionType, amount) VALUES (?, ?, ?)',
-////                  [mobileNumber, commissionType, formattedCommissionAmount],
-////                  (err, result) => {
-////                      if (err) {
-////                          console.error('Error assigning commission:', err);
-////                          reject(err);
-////                          return;
-////                      }
-////                      resolve(result);
-////                  }
-////              );
-////          });
+      // If the commission entry already exists, update the amount
+      if (existingCommission && existingCommission.length > 0) {
+          await updateCommissionAmount(mobileNumber, commissionType, formattedCommissionAmount);
+      } else {
+          // Insert commission details into the database
+          await new Promise((resolve, reject) => {
+              db.query(
+                  'INSERT INTO tbl_commission (mobileNumber, commissionType, amount) VALUES (?, ?, ?)',
+                  [mobileNumber, commissionType, formattedCommissionAmount],
+                  (err, result) => {
+                      if (err) {
+                          console.error('Error assigning commission:', err);
+                          reject(err);
+                          return;
+                      }
+                      resolve(result);
+                  }
+              );
+          });
 
-////          console.log(`Inserted new commission for ${mobileNumber} of type ${commissionType} with amount ${formattedCommissionAmount}`);
-////      }
-////  } catch (error) {
-////      console.error('Error assigning commission:', error);
-////      throw new Error('Error assigning commission');
-////  }
-////}
+          console.log(`Inserted new commission for ${mobileNumber} of type ${commissionType} with amount ${formattedCommissionAmount}`);
+      }
+  } catch (error) {
+      console.error('Error assigning commission:', error);
+      throw new Error('Error assigning commission');
+  }
+}
  
 
-////// Function to check and assign commission based on the sales associate number
-////async function checkAndAssignCommission(salesAssociateNumber) {
-////  console.log('Checking and assigning commission for sales associate:', salesAssociateNumber);
+// Function to check and assign commission based on the sales associate number
+async function checkAndAssignCommission(salesAssociateNumber) {
+  console.log('Checking and assigning commission for sales associate:', salesAssociateNumber);
 
-////  if (!salesAssociateNumber) {
-////      console.log('No sales associate number provided, skipping commission assignment.');
-////      return;
-////  }
+  if (!salesAssociateNumber) {
+      console.log('No sales associate number provided, skipping commission assignment.');
+      return;
+  }
 
-////  try {
-////      // Check if the sales associate number exists in the database
-////      const salesAssociateResult = await new Promise((resolve, reject) => {
-////          db.query('SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?', [salesAssociateNumber], (err, result) => {
-////              if (err) {
-////                  console.error('Error checking sales associate number:', err);
-////                  reject(err);
-////                  return;
-////              }
-////              resolve(result);
-////          });
-////      });
+  try {
+      // Check if the sales associate number exists in the database
+      const salesAssociateResult = await new Promise((resolve, reject) => {
+          db.query('SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?', [salesAssociateNumber], (err, result) => {
+              if (err) {
+                  console.error('Error checking sales associate number:', err);
+                  reject(err);
+                  return;
+              }
+              resolve(result);
+          });
+      });
 
-////      if (salesAssociateResult.length === 0) {
-////          console.warn(`Sales associate number ${salesAssociateNumber} is not valid, no commission assigned.`);
-////          return { error: `Sales associate number ${salesAssociateNumber} is not valid, no commission assigned.` };
-////      }
+      if (salesAssociateResult.length === 0) {
+          console.warn(`Sales associate number ${salesAssociateNumber} is not valid, no commission assigned.`);
+          return { error: `Sales associate number ${salesAssociateNumber} is not valid, no commission assigned.` };
+      }
 
-////      let addedBy = null;
+      let addedBy = null;
 
-////      // Check if the sales associate was added by someone
-////      const addedByResult = await new Promise((resolve, reject) => {
-////          db.query('SELECT addedBy FROM tbl_salesexecutives WHERE mobileNo = ?', [salesAssociateNumber], (err, result) => {
-////              if (err) {
-////                  console.error('Error fetching addedBy data:', err);
-////                  reject(err);
-////                  return;
-////              }
-////              resolve(result);
-////          });
-////      });
+      // Check if the sales associate was added by someone
+      const addedByResult = await new Promise((resolve, reject) => {
+          db.query('SELECT addedBy FROM tbl_salesexecutives WHERE mobileNo = ?', [salesAssociateNumber], (err, result) => {
+              if (err) {
+                  console.error('Error fetching addedBy data:', err);
+                  reject(err);
+                  return;
+              }
+              resolve(result);
+          });
+      });
 
-////      if (addedByResult && addedByResult.length > 0) {
-////          addedBy = addedByResult[0].addedBy;
-////      }
+      if (addedByResult && addedByResult.length > 0) {
+          addedBy = addedByResult[0].addedBy;
+      }
 
-////      // Fetch commission rates from the database
-////      const commissionRates = await fetchCommissionRates();
+      // Fetch commission rates from the database
+      const commissionRates = await fetchCommissionRates();
 
-////      // Assign commission to the sales associate
-////      const commissionAmountBase = commissionRates['Base'];
-////      await assignCommission(salesAssociateNumber, 'Base', commissionAmountBase);
+      // Assign commission to the sales associate
+      const commissionAmountBase = commissionRates['Base'];
+      await assignCommission(salesAssociateNumber, 'Base', commissionAmountBase);
 
-////      // If the sales associate was added by someone, assign additional commission
-////      if (addedBy) {
-////          const commissionAmountL1 = commissionRates['L1'];
-////          await assignCommission(addedBy, 'L1', commissionAmountL1);
+      // If the sales associate was added by someone, assign additional commission
+      if (addedBy) {
+          const commissionAmountL1 = commissionRates['L1'];
+          await assignCommission(addedBy, 'L1', commissionAmountL1);
 
-////          // Check if the person who added the sales associate was also added by someone
-////          const addedByAddedByResult = await new Promise((resolve, reject) => {
-////              db.query('SELECT addedBy FROM tbl_salesexecutives WHERE mobileNo = ?', [addedBy], (err, result) => {
-////                  if (err) {
-////                      console.error('Error fetching addedByAddedBy data:', err);
-////                      reject(err);
-////                      return;
-////                  }
-////                  resolve(result);
-////              });
-////          });
+          // Check if the person who added the sales associate was also added by someone
+          const addedByAddedByResult = await new Promise((resolve, reject) => {
+              db.query('SELECT addedBy FROM tbl_salesexecutives WHERE mobileNo = ?', [addedBy], (err, result) => {
+                  if (err) {
+                      console.error('Error fetching addedByAddedBy data:', err);
+                      reject(err);
+                      return;
+                  }
+                  resolve(result);
+              });
+          });
 
-////          if (addedByAddedByResult && addedByAddedByResult.length > 0) {
-////              const addedByAddedBy = addedByAddedByResult[0].addedBy;
-////              if (addedByAddedBy) {
-////                  const commissionAmountL2 = commissionRates['L2'];
-////                  await assignCommission(addedByAddedBy, 'L2', commissionAmountL2);
-////              } else {
-////                  console.warn(`No further addedBy found for ${addedBy}, skipping L2 commission assignment.`);
-////              }
-////          } else {
-////              console.warn(`No further addedBy found for ${addedBy}, skipping L2 commission assignment.`);
-////          }
-////      }
+          if (addedByAddedByResult && addedByAddedByResult.length > 0) {
+              const addedByAddedBy = addedByAddedByResult[0].addedBy;
+              if (addedByAddedBy) {
+                  const commissionAmountL2 = commissionRates['L2'];
+                  await assignCommission(addedByAddedBy, 'L2', commissionAmountL2);
+              } else {
+                  console.warn(`No further addedBy found for ${addedBy}, skipping L2 commission assignment.`);
+              }
+          } else {
+              console.warn(`No further addedBy found for ${addedBy}, skipping L2 commission assignment.`);
+          }
+      }
 
-////  } catch (error) {
-////      console.error('Error assigning commission:', error);
-////      throw new Error('Error assigning commission');
-////  }
-////}
+  } catch (error) {
+      console.error('Error assigning commission:', error);
+      throw new Error('Error assigning commission');
+  }
+}
 
 
-////app.post('/submit-form', (req, res) => {
-////  const { firstName, lastName, mobileNumber, pincode } = req.body;
-////  const commissionLevel = 'L0'; 
-////  const sql = 'INSERT INTO tbl_salesexecutives (firstName, lastName, mobileNo, pincode, level) VALUES (?, ?, ?, ?, ?)';
-////  db.query(sql, [firstName, lastName, mobileNumber, pincode, commissionLevel], (err, result) => {
-////    if (err) {
-////      console.error('Error saving data to database:', err);
-////      res.status(500).json({ error: 'Internal server error' });
-////      return;
-////    }
-////    console.log('Data saved to database');
-////    res.json({ success: true });
-////  });
-////});
+app.post('/submit-form', (req, res) => {
+  const { firstName, lastName, mobileNumber, pincode } = req.body;
+  const commissionLevel = 'L0'; 
+  const sql = 'INSERT INTO tbl_salesexecutives (firstName, lastName, mobileNo, pincode, level) VALUES (?, ?, ?, ?, ?)';
+  db.query(sql, [firstName, lastName, mobileNumber, pincode, commissionLevel], (err, result) => {
+    if (err) {
+      console.error('Error saving data to database:', err);
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+    console.log('Data saved to database');
+    res.json({ success: true });
+  });
+});
 
-////app.post('/submit-team-member', (req, res) => {
-////  const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy } = req.body;
+app.post('/submit-team-member', (req, res) => {
+  const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy } = req.body;
   
-////  // New team members should be assigned level L0 by default
-////  const level = 'L0';
+  // New team members should be assigned level L0 by default
+  const level = 'L0';
 
-////  const insertSql = 'INSERT INTO tbl_salesexecutives (mobileNo, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-////  db.query(insertSql, [mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level], (err, result) => {
-////      if (err) {
-////          console.error('Error saving data to database:', err);
-////          res.status(500).json({ error: 'Internal server error' });
-////          return;
-////      }
-////      console.log('Team member added successfully');
-////      res.json({ success: true });
-////  });
-////})
-
-
-////app.get('/my-team/:mobileNumber', (req, res) => {
-////  const { mobileNumber } = req.params;
-////  const sql = 'SELECT * FROM tbl_salesexecutives WHERE addedBy = ?';
-////  db.query(sql, [mobileNumber], (err, result) => {
-////    if (err) {
-////      console.error('Error fetching data from database:', err);
-////      res.status(500).json({ error: 'Internal server error' });
-////      return;
-////    }
-////    console.log('Data fetched successfully');
-////    res.json(result);
-////  });
-////});
+  const insertSql = 'INSERT INTO tbl_salesexecutives (mobileNo, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  db.query(insertSql, [mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level], (err, result) => {
+      if (err) {
+          console.error('Error saving data to database:', err);
+          res.status(500).json({ error: 'Internal server error' });
+          return;
+      }
+      console.log('Team member added successfully');
+      res.json({ success: true });
+  });
+})
 
 
-////app.get('/my-profile/:mobileNumber', (req, res) => {
-////  const mobileNumber = req.params.mobileNumber;
-////  const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
-////  db.query(sql, [mobileNumber], (err, result) => {
-////    if (err) {
-////      console.error('Error fetching profile:', err);
-////      res.status(500).send('Error fetching profile');
-////      return;
-////    }
-////    if (result.length === 0) {
-////      res.status(404).send('Profile not found');
-////      return;
-////    }
-////    res.status(200).json(result[0]);
-////  });
-////});
-
-////// Route to update user's profile
-////app.post('/update-profile', (req, res) => {
-////  const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard } = req.body;
-////  const sql = 'UPDATE tbl_salesexecutives SET firstName = ?, lastName = ?, pincode = ?, aadhar = ?, upi = ?, pancard = ? WHERE mobileNo = ?';
-////  db.query(sql, [firstName, lastName, pincode, aadhar, upi, pancard, mobileNumber], (err, result) => {
-////    if (err) {
-////      console.error('Error updating profile:', err);
-////      res.status(500).send('Error updating profile');
-////      return;
-////    }
-////    console.log('Profile updated successfully');
-////    res.status(200).send('Profile updated successfully');
-////  });
-////});
+app.get('/my-team/:mobileNumber', (req, res) => {
+  const { mobileNumber } = req.params;
+  const sql = 'SELECT * FROM tbl_salesexecutives WHERE addedBy = ?';
+  db.query(sql, [mobileNumber], (err, result) => {
+    if (err) {
+      console.error('Error fetching data from database:', err);
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+    console.log('Data fetched successfully');
+    res.json(result);
+  });
+});
 
 
-////app.get('/shops', (req, res) => {
-////  const { salesAssociateNumber } = req.query;
-////  const query = `
-////      SELECT * 
-////      FROM shopkeeper 
-////      WHERE salesAssociateNumber = ?;
-////  `;
-////  db.query(query, [salesAssociateNumber], (error, results) => {
-////      if (error) {
-////          console.error('Error fetching shops:', error);
-////          res.status(500).json({ error: 'Internal Server Error' });
-////          return;
-////      }
-////      res.json(results);
-////  });
-////});
+app.get('/my-profile/:mobileNumber', (req, res) => {
+  const mobileNumber = req.params.mobileNumber;
+  const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
+  db.query(sql, [mobileNumber], (err, result) => {
+    if (err) {
+      console.error('Error fetching profile:', err);
+      res.status(500).send('Error fetching profile');
+      return;
+    }
+    if (result.length === 0) {
+      res.status(404).send('Profile not found');
+      return;
+    }
+    res.status(200).json(result[0]);
+  });
+});
 
-////app.post('/check-user', (req, res) => {
-////  const { mobileNumber } = req.body;
-////  const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
-////  db.query(sql, [mobileNumber], (err, results) => {
-////    if (err) {
-////      console.error('Error checking user:', err);
-////      res.status(500).json({ error: 'Internal server error' });
-////      return;
-////    }
-
-////    if (results.length > 0) {
-////      res.json({ exists: true });
-////    } else {
-////      res.json({ exists: false });
-////    }
-////  });
-////});
-
-////// Calculate total commission for a given sales associate
-////app.get('/total-commission/:mobileNumber', (req, res) => {
-////  const { mobileNumber } = req.params;
-
-////  // Fetch the level and addedBy of the user
-////  db.query('SELECT level, addedBy FROM nkd.tbl_salesexecutives WHERE mobileNo = ?', [mobileNumber], (err, result) => {
-////      if (err) {
-////          console.error('Error fetching user data:', err);
-////          return res.status(500).json({ error: 'Internal server error' });
-////      }
-////      if (result.length === 0) {
-////          return res.status(404).json({ error: 'User not found' });
-////      }
-
-////      const { level, addedBy } = result[0];
-////      console.log(`User Level: ${level}, Added By: ${addedBy}`);
-
-////      // Fetch individual commission rate
-////      db.query('SELECT commission_amount FROM nkd.commission WHERE level = ?', [level], (err, result) => {
-////          if (err) {
-////              console.error('Error fetching individual commission:', err);
-////              return res.status(500).json({ error: 'Internal server error' });
-////          }
-
-////          if (result.length === 0) {
-////              return res.status(404).json({ error: 'Individual commission data not found' });
-////          }
-
-////          const individualCommission = result[0].commission_amount;
-////          console.log(`Individual Commission for ${level}: ${individualCommission}`);
-
-////          // Fetch commission adjustment based on who registered the shop
-////          db.query('SELECT commission_amount FROM nkd.commission_level WHERE from_level = ? AND to_level = ?', [addedBy, level], (err, result) => {
-////              if (err) {
-////                  console.error('Error fetching commission adjustment:', err);
-////                  return res.status(500).json({ error: 'Internal server error' });
-////              }
-
-////              const adjustment = result.length ? result[0].commission_amount : 0;
-////              console.log(`Commission Adjustment from ${addedBy} to ${level}: ${adjustment}`);
-
-////              // Calculate total commission
-////              db.query('SELECT COUNT(*) AS shopCount FROM shopkeepers WHERE salesAssociateNumber = ?', [mobileNumber], (err, result) => {
-////                  if (err) {
-////                      console.error('Error calculating total commission:', err);
-////                      return res.status(500).json({ error: 'Internal server error' });
-////                  }
-
-////                  const shopCount = result[0].shopCount;
-////                  console.log(`Shop Count for ${mobileNumber}: ${shopCount}`);
-
-////                  let totalCommission = 0;
-
-////                  if (level === 'L1') {
-////                      // For L1, no additional adjustments
-////                      totalCommission = individualCommission * shopCount;
-////                      console.log(`Total Commission for ${mobileNumber} (L1): ${totalCommission}`);
-////                      return res.json({ totalCommission });
-////                  } else if (level === 'L2') {
-////                      totalCommission = (individualCommission + adjustment) * shopCount;
-////                      console.log(`Total Commission for ${mobileNumber} (L2): ${totalCommission}`);
-////                      return res.json({ totalCommission });
-////                  } else if (level === 'L3') {
-////                      // Fetch commission adjustment for L3 to L2
-////                      db.query('SELECT commission_amount FROM nkd.commission_level WHERE from_level = ? AND to_level = ?', ['L3', 'L2'], (err, l3ToL2Result) => {
-////                          if (err) {
-////                              console.error('Error fetching commission adjustment for L3 to L2:', err);
-////                              return res.status(500).json({ error: 'Internal server error' });
-////                          }
-
-////                          const l3ToL2Adjustment = l3ToL2Result.length ? l3ToL2Result[0].commission_amount : 0;
-////                          console.log(`L3 to L2 Adjustment: ${l3ToL2Adjustment}`);
-
-////                          // Fetch commission adjustment for L2 to L1
-////                          db.query('SELECT commission_amount FROM nkd.commission_level WHERE from_level = ? AND to_level = ?', ['L2', 'L1'], (err, l2ToL1Result) => {
-////                              if (err) {
-////                                  console.error('Error fetching commission adjustment for L2 to L1:', err);
-////                                  return res.status(500).json({ error: 'Internal server error' });
-////                              }
-
-////                              const l2ToL1Adjustment = l2ToL1Result.length ? l2ToL1Result[0].commission_amount : 0;
-////                              console.log(`L2 to L1 Adjustment: ${l2ToL1Adjustment}`);
-
-////                              totalCommission = (individualCommission + adjustment) * shopCount;
-////                              const totalL2Commission = l3ToL2Adjustment * shopCount;
-////                              const totalL1Commission = l2ToL1Adjustment * shopCount;
-
-////                              console.log(`Total Commission for ${mobileNumber} (L3): ${totalCommission}`);
-////                              console.log(`Total L2 Commission due to ${mobileNumber} (L3): ${totalL2Commission}`);
-////                              console.log(`Total L1 Commission due to ${mobileNumber} (L3): ${totalL1Commission}`);
-
-////                              return res.json({ 
-////                                  totalCommission, 
-////                                  additionalCommissions: {
-////                                      totalL2Commission,
-////                                      totalL1Commission
-////                                  }
-////                              });
-////                          });
-////                      });
-////                  }
-////              });
-////          });
-////      });
-////  });
-////});
+// Route to update user's profile
+app.post('/update-profile', (req, res) => {
+  const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard } = req.body;
+  const sql = 'UPDATE tbl_salesexecutives SET firstName = ?, lastName = ?, pincode = ?, aadhar = ?, upi = ?, pancard = ? WHERE mobileNo = ?';
+  db.query(sql, [firstName, lastName, pincode, aadhar, upi, pancard, mobileNumber], (err, result) => {
+    if (err) {
+      console.error('Error updating profile:', err);
+      res.status(500).send('Error updating profile');
+      return;
+    }
+    console.log('Profile updated successfully');
+    res.status(200).send('Profile updated successfully');
+  });
+});
 
 
-////app.get('/user-level/:mobileNumber', (req, res) => {
-////  const { mobileNumber } = req.params;
-////  const sql = 'SELECT level FROM nkd.tbl_salesexecutives WHERE mobileNo = ?';
-////  db.query(sql, [mobileNumber], (err, result) => {
-////      if (err) {
-////          console.error('Error fetching user level:', err);
-////          res.status(500).json({ error: 'Internal server error' });
-////          return;
-////      }
-////      if (result.length === 0) {
-////          res.status(404).json({ error: 'User not found' });
-////          return;
-////      }
-////      res.json({ level: result[0].level });
-////  });
-////});
+app.get('/shops', (req, res) => {
+  const { salesAssociateNumber } = req.query;
+  const query = `
+      SELECT * 
+      FROM shopkeeper 
+      WHERE salesAssociateNumber = ?;
+  `;
+  db.query(query, [salesAssociateNumber], (error, results) => {
+      if (error) {
+          console.error('Error fetching shops:', error);
+          res.status(500).json({ error: 'Internal Server Error' });
+          return;
+      }
+      res.json(results);
+  });
+});
+
+app.post('/check-user', (req, res) => {
+  const { mobileNumber } = req.body;
+  const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
+  db.query(sql, [mobileNumber], (err, results) => {
+    if (err) {
+      console.error('Error checking user:', err);
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+
+    if (results.length > 0) {
+      res.json({ exists: true });
+    } else {
+      res.json({ exists: false });
+    }
+  });
+});
+
+// Calculate total commission for a given sales associate
+app.get('/total-commission/:mobileNumber', (req, res) => {
+  const { mobileNumber } = req.params;
+
+  // Fetch the level and addedBy of the user
+  db.query('SELECT level, addedBy FROM nkd.tbl_salesexecutives WHERE mobileNo = ?', [mobileNumber], (err, result) => {
+      if (err) {
+          console.error('Error fetching user data:', err);
+          return res.status(500).json({ error: 'Internal server error' });
+      }
+      if (result.length === 0) {
+          return res.status(404).json({ error: 'User not found' });
+      }
+
+      const { level, addedBy } = result[0];
+      console.log(`User Level: ${level}, Added By: ${addedBy}`);
+
+      // Fetch individual commission rate
+      db.query('SELECT commission_amount FROM nkd.commission WHERE level = ?', [level], (err, result) => {
+          if (err) {
+              console.error('Error fetching individual commission:', err);
+              return res.status(500).json({ error: 'Internal server error' });
+          }
+
+          if (result.length === 0) {
+              return res.status(404).json({ error: 'Individual commission data not found' });
+          }
+
+          const individualCommission = result[0].commission_amount;
+          console.log(`Individual Commission for ${level}: ${individualCommission}`);
+
+          // Fetch commission adjustment based on who registered the shop
+          db.query('SELECT commission_amount FROM nkd.commission_level WHERE from_level = ? AND to_level = ?', [addedBy, level], (err, result) => {
+              if (err) {
+                  console.error('Error fetching commission adjustment:', err);
+                  return res.status(500).json({ error: 'Internal server error' });
+              }
+
+              const adjustment = result.length ? result[0].commission_amount : 0;
+              console.log(`Commission Adjustment from ${addedBy} to ${level}: ${adjustment}`);
+
+              // Calculate total commission
+              db.query('SELECT COUNT(*) AS shopCount FROM shopkeepers WHERE salesAssociateNumber = ?', [mobileNumber], (err, result) => {
+                  if (err) {
+                      console.error('Error calculating total commission:', err);
+                      return res.status(500).json({ error: 'Internal server error' });
+                  }
+
+                  const shopCount = result[0].shopCount;
+                  console.log(`Shop Count for ${mobileNumber}: ${shopCount}`);
+
+                  let totalCommission = 0;
+
+                  if (level === 'L1') {
+                      // For L1, no additional adjustments
+                      totalCommission = individualCommission * shopCount;
+                      console.log(`Total Commission for ${mobileNumber} (L1): ${totalCommission}`);
+                      return res.json({ totalCommission });
+                  } else if (level === 'L2') {
+                      totalCommission = (individualCommission + adjustment) * shopCount;
+                      console.log(`Total Commission for ${mobileNumber} (L2): ${totalCommission}`);
+                      return res.json({ totalCommission });
+                  } else if (level === 'L3') {
+                      // Fetch commission adjustment for L3 to L2
+                      db.query('SELECT commission_amount FROM nkd.commission_level WHERE from_level = ? AND to_level = ?', ['L3', 'L2'], (err, l3ToL2Result) => {
+                          if (err) {
+                              console.error('Error fetching commission adjustment for L3 to L2:', err);
+                              return res.status(500).json({ error: 'Internal server error' });
+                          }
+
+                          const l3ToL2Adjustment = l3ToL2Result.length ? l3ToL2Result[0].commission_amount : 0;
+                          console.log(`L3 to L2 Adjustment: ${l3ToL2Adjustment}`);
+
+                          // Fetch commission adjustment for L2 to L1
+                          db.query('SELECT commission_amount FROM nkd.commission_level WHERE from_level = ? AND to_level = ?', ['L2', 'L1'], (err, l2ToL1Result) => {
+                              if (err) {
+                                  console.error('Error fetching commission adjustment for L2 to L1:', err);
+                                  return res.status(500).json({ error: 'Internal server error' });
+                              }
+
+                              const l2ToL1Adjustment = l2ToL1Result.length ? l2ToL1Result[0].commission_amount : 0;
+                              console.log(`L2 to L1 Adjustment: ${l2ToL1Adjustment}`);
+
+                              totalCommission = (individualCommission + adjustment) * shopCount;
+                              const totalL2Commission = l3ToL2Adjustment * shopCount;
+                              const totalL1Commission = l2ToL1Adjustment * shopCount;
+
+                              console.log(`Total Commission for ${mobileNumber} (L3): ${totalCommission}`);
+                              console.log(`Total L2 Commission due to ${mobileNumber} (L3): ${totalL2Commission}`);
+                              console.log(`Total L1 Commission due to ${mobileNumber} (L3): ${totalL1Commission}`);
+
+                              return res.json({ 
+                                  totalCommission, 
+                                  additionalCommissions: {
+                                      totalL2Commission,
+                                      totalL1Commission
+                                  }
+                              });
+                          });
+                      });
+                  }
+              });
+          });
+      });
+  });
+});
 
 
-////app.get('/commission/:level', (req, res) => {
-////const level = req.params.level;
-
-////const sql = 'SELECT commission_amount FROM nkd.commission WHERE level = ?';
-////db.query(sql, [level], (err, result) => {
-////  if (err) {
-////    console.error('Error fetching commission:', err);
-////    res.status(500).json({ success: false, error: 'Internal server error' });
-////    return;
-////  }
-
-////  if (result.length === 0) {
-////    res.status(404).json({ success: false, error: 'Commission data not found' });
-////  } else {
-////    const commission = result[0].commission_amount;
-////    res.json({ success: true, commission });
-////  }
-////});
-////});
+app.get('/user-level/:mobileNumber', (req, res) => {
+  const { mobileNumber } = req.params;
+  const sql = 'SELECT level FROM nkd.tbl_salesexecutives WHERE mobileNo = ?';
+  db.query(sql, [mobileNumber], (err, result) => {
+      if (err) {
+          console.error('Error fetching user level:', err);
+          res.status(500).json({ error: 'Internal server error' });
+          return;
+      }
+      if (result.length === 0) {
+          res.status(404).json({ error: 'User not found' });
+          return;
+      }
+      res.json({ level: result[0].level });
+  });
+});
 
 
+app.get('/commission/:level', (req, res) => {
+const level = req.params.level;
+
+const sql = 'SELECT commission_amount FROM nkd.commission WHERE level = ?';
+db.query(sql, [level], (err, result) => {
+  if (err) {
+    console.error('Error fetching commission:', err);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+    return;
+  }
+
+  if (result.length === 0) {
+    res.status(404).json({ success: false, error: 'Commission data not found' });
+  } else {
+    const commission = result[0].commission_amount;
+    res.json({ success: true, commission });
+  }
+});
+});
 
 
 
-////// Example route for checking sales associate number
-////app.get('/checkSalesAssociate/:number', (req, res) => {
-////  const { number } = req.params;
-
-////  // Check if the mobile number exists in the tbl_salesexecutives table
-////  db.query('SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?', [number], (err, results) => {
-////      if (err) {
-////          console.error('Error checking sales associate existence:', err);
-////          return res.status(500).json({ message: 'Internal server error' });
-////      }
-
-////      if (results.length > 0) {
-////          // Mobile number exists in the tbl_salesexecutives database
-////          return res.status(200).json({ exists: true });
-////      } else {
-////          // Mobile number doesn't exist in the tbl_salesexecutives database
-////          return res.status(200).json({ exists: false });
-////      }
-////  });
-////});
-
-//////2587413690
-
-////app.put('/updateProfile/:phoneNumber', (req, res) => {
-////  const { phoneNumber } = req.params;
-////  const {
-////      shopkeeperName,
-////      pincode,
-////      shopState,
-////      city,
-////      address,
-////      salesAssociateNumber,
-////      selectedCategory
-////  } = req.body;s
-
-////  const query = `
-////      UPDATE nkd.shopkeepers
-////      SET 
-////          shopkeeperName = ?,
-////          pincode = ?,
-////          shopState = ?,
-////          city = ?,
-////          address = ?,
-////          salesAssociateNumber = ?,
-////          selectedCategory = ?
-////      WHERE phoneNumber = ?
-////  `;
-
-////  db.query(
-////      query,
-////      [
-////          shopkeeperName,
-////          pincode,
-////          shopState,
-////          city,
-////          address,
-////          salesAssociateNumber,
-////          selectedCategory,
-////          phoneNumber
-////      ],
-////      (error, results) => {
-////          if (error) {
-////              console.error('Error executing query:', error);
-////              return res.status(500).json({ error: 'Database query error' });
-////          }
-////          res.json({ message: 'Shopkeeper profile updated successfully' });
-////      }
-////  );
-////});
-////// Endpoint to retrieve total commission for a specific mobile number
-////app.get('/myTotalCommission', async (req, res) => {
-////  const { mobileNumber } = req.query;
-
-////  try {
-////      // Retrieve total commission for the specified mobile number
-////      const totalCommission = await new Promise((resolve, reject) => {
-////          db.query(
-////              'SELECT SUM(amount) AS totalCommission FROM tbl_commission WHERE mobileNumber = ?',
-////              [mobileNumber],
-////              (err, result) => {
-////                  if (err) {
-////                      console.error('Error fetching total commission:', err);
-////                      reject(err);
-////                      return;
-////                  }
-////                  resolve(result[0].totalCommission || 0);
-////              }
-////          );
-////      });
-
-////      res.status(200).json({ totalCommission });
-////  } catch (error) {
-////      console.error('Error retrieving total commission:', error);
-////      res.status(500).json({ message: 'Internal server error' });
-////  }
-////});
 
 
+// Example route for checking sales associate number
+app.get('/checkSalesAssociate/:number', (req, res) => {
+  const { number } = req.params;
 
-//////Register Shopkeeper from sales executive module 
-////app.post('/registerSales', upload.none(), async (req, res) => {
-////  const {
-////      phoneNumber,
-////      shopkeeperName,
-////      shopID,
-////      pincode,
-////      shopState,
-////      city,
-////      address,
-////      salesAssociateNumber,
-////      selectedCategory,
-////      selectedSubCategory,
-////  } = req.body;
+  // Check if the mobile number exists in the tbl_salesexecutives table
+  db.query('SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?', [number], (err, results) => {
+      if (err) {
+          console.error('Error checking sales associate existence:', err);
+          return res.status(500).json({ message: 'Internal server error' });
+      }
 
-////  try {
-////      // Insert new shopkeeper into the database
-////      await new Promise((resolve, reject) => {
-////          db.query(
-////              'INSERT INTO shopkeepers (phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-////              [phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory],
-////              (err, result) => {
-////                  if (err) {
-////                      console.error('Error registering shopkeeper:', err);
-////                      reject(err);
-////                      return;
-////                  }
-////                  resolve(result);
-////              }
-////          );
-////      });
+      if (results.length > 0) {
+          // Mobile number exists in the tbl_salesexecutives database
+          return res.status(200).json({ exists: true });
+      } else {
+          // Mobile number doesn't exist in the tbl_salesexecutives database
+          return res.status(200).json({ exists: false });
+      }
+  });
+});
 
-////      // Check if the sales associate was added by someone and assign commission
-////      await checkAndAssignCommission(salesAssociateNumber);
+//2587413690
 
-////      res.status(200).json({ message: 'Shopkeeper registered successfully' });
-////  } catch (error) {
-////      console.error('Error registering shopkeeper:', error);
-////      res.status(500).json({ message: 'Internal server error' });
-////  }
-////});
+app.put('/updateProfile/:phoneNumber', (req, res) => {
+  const { phoneNumber } = req.params;
+  const {
+      shopkeeperName,
+      pincode,
+      shopState,
+      city,
+      address,
+      salesAssociateNumber,
+      selectedCategory
+  } = req.body;s
+
+  const query = `
+      UPDATE nkd.shopkeepers
+      SET 
+          shopkeeperName = ?,
+          pincode = ?,
+          shopState = ?,
+          city = ?,
+          address = ?,
+          salesAssociateNumber = ?,
+          selectedCategory = ?
+      WHERE phoneNumber = ?
+  `;
+
+  db.query(
+      query,
+      [
+          shopkeeperName,
+          pincode,
+          shopState,
+          city,
+          address,
+          salesAssociateNumber,
+          selectedCategory,
+          phoneNumber
+      ],
+      (error, results) => {
+          if (error) {
+              console.error('Error executing query:', error);
+              return res.status(500).json({ error: 'Database query error' });
+          }
+          res.json({ message: 'Shopkeeper profile updated successfully' });
+      }
+  );
+});
+// Endpoint to retrieve total commission for a specific mobile number
+app.get('/myTotalCommission', async (req, res) => {
+  const { mobileNumber } = req.query;
+
+  try {
+      // Retrieve total commission for the specified mobile number
+      const totalCommission = await new Promise((resolve, reject) => {
+          db.query(
+              'SELECT SUM(amount) AS totalCommission FROM tbl_commission WHERE mobileNumber = ?',
+              [mobileNumber],
+              (err, result) => {
+                  if (err) {
+                      console.error('Error fetching total commission:', err);
+                      reject(err);
+                      return;
+                  }
+                  resolve(result[0].totalCommission || 0);
+              }
+          );
+      });
+
+      res.status(200).json({ totalCommission });
+  } catch (error) {
+      console.error('Error retrieving total commission:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+//Register Shopkeeper from sales executive module 
+app.post('/registerSales', upload.none(), async (req, res) => {
+  const {
+      phoneNumber,
+      shopkeeperName,
+      shopID,
+      pincode,
+      shopState,
+      city,
+      address,
+      salesAssociateNumber,
+      selectedCategory,
+      selectedSubCategory,
+  } = req.body;
+
+  try {
+      // Insert new shopkeeper into the database
+      await new Promise((resolve, reject) => {
+          db.query(
+              'INSERT INTO shopkeepers (phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              [phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory],
+              (err, result) => {
+                  if (err) {
+                      console.error('Error registering shopkeeper:', err);
+                      reject(err);
+                      return;
+                  }
+                  resolve(result);
+              }
+          );
+      });
+
+      // Check if the sales associate was added by someone and assign commission
+      await checkAndAssignCommission(salesAssociateNumber);
+
+      res.status(200).json({ message: 'Shopkeeper registered successfully' });
+  } catch (error) {
+      console.error('Error registering shopkeeper:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 
