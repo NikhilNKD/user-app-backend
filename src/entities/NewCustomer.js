@@ -15,6 +15,7 @@ export const NewCustomer = new EntitySchema({
     },
     name: {
       type: 'varchar',
+      nullable: true,
     },
     pincode: {
       type: 'varchar',

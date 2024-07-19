@@ -1803,203 +1803,203 @@ app.use('/api', routes);
 
 
 
-////app.get('/subservices/mainservice/:mainServiceId', (req, res) => {
-////  const mainServiceId = req.params.mainServiceId;
+app.get('/subservices/mainservice/:mainServiceId', (req, res) => {
+  const mainServiceId = req.params.mainServiceId;
 
-////  // Query the database for sub-services based on main service ID
-////  db.query('SELECT * FROM nkd.tbl_salon_sub_sub_services WHERE main_service_id = ?', [mainServiceId], (err, results) => {
-////    if (err) {
-////      console.error('Error fetching sub-services:', err);
-////      res.status(500).json({ message: 'Internal server error' });
-////    } else {
-////      res.status(200).json(results);
-////    }
-////  });
-////});
-
- 
-
-////app.get('/searchServices', (req, res) => {
-////  const { query } = req.query; // Get the search query from the request query parameters
-
-////  // Query the database for services matching the search query
-////  db.query(
-////      'SELECT * FROM nkd.tbl_salon_main_services WHERE name LIKE ? OR description LIKE ?',
-////      [`%${query}%`, `%${query}%`],
-////      (err, results) => {
-////          if (err) {
-////              console.error('Error fetching services:', err);
-////              return res.status(500).json({ message: 'Internal server error' });
-////          }
-////          // Send the results back to the client
-////          res.status(200).json(results);
-////      }
-////  );
-////});
-
-
+  // Query the database for sub-services based on main service ID
+  db.query('SELECT * FROM nkd.tbl_salon_sub_sub_services WHERE main_service_id = ?', [mainServiceId], (err, results) => {
+    if (err) {
+      console.error('Error fetching sub-services:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
 
  
 
-////app.get('/mainService/:subServiceId', (req, res) => {
-////  const subServiceId = req.params.subServiceId;
+app.get('/searchServices', (req, res) => {
+  const { query } = req.query; // Get the search query from the request query parameters
 
-////  db.query(
-////      'SELECT m.name FROM nkd.tbl_salon_main_services m JOIN nkd.tbl_salon_sub_sub_services s ON m.id = s.main_service_id WHERE s.id = ?',
-////      [subServiceId],
-////      (err, results) => {
-////          if (err) {
-////              console.error('Error fetching main service name:', err);
-////              return res.status(500).json({ message: 'Internal server error' });
-////          }
-////          if (results.length === 0) {
-////              return res.status(404).json({ message: 'Main service not found for the given sub-service ID' });
-////          }
-////          res.status(200).json(results[0]);
-////      }
-////  );
-////});
-
-
-////app.post('/saveSelectedServices', (req, res) => {
-////  const { phoneNumber, selectedServices } = req.body;
-
-////  // Using callback-based approach for all queries
-////  db.query('START TRANSACTION', (err) => {
-////    if (err) {
-////      console.error('Error starting transaction:', err);
-////      return res.status(500).json({ error: 'Internal server error' });
-////    }
-
-////    // Use a counter to handle multiple queries
-////    let queriesRemaining = selectedServices.length;
-
-////    selectedServices.forEach(service => {
-////      db.query(
-////        'INSERT INTO tbl_selected_services (phoneNumber, mainServiceId, subServiceId, price) VALUES (?, ?, ?, ?)',
-////        [phoneNumber, service.mainServiceId, service.subServiceId, service.price],
-////        (err) => {
-////          if (err) {
-////            console.error('Error inserting selected service:', err);
-////            // Rollback transaction on error
-////            db.query('ROLLBACK', () => {
-////              res.status(500).json({ error: 'Internal server error' });
-////            });
-////            return;
-////          }
-
-////          queriesRemaining -= 1;
-
-////          // Commit transaction if all queries are done
-////          if (queriesRemaining === 0) {
-////            db.query('COMMIT', (err) => {
-////              if (err) {
-////                console.error('Error committing transaction:', err);
-////                res.status(500).json({ error: 'Internal server error' });
-////              } else {
-////                res.status(200).json({ message: 'Selected services saved successfully.' });
-////              }
-////            });
-////          }
-////        }
-////      );
-////    });
-////  });
-////});
+  // Query the database for services matching the search query
+  db.query(
+      'SELECT * FROM nkd.tbl_salon_main_services WHERE name LIKE ? OR description LIKE ?',
+      [`%${query}%`, `%${query}%`],
+      (err, results) => {
+          if (err) {
+              console.error('Error fetching services:', err);
+              return res.status(500).json({ message: 'Internal server error' });
+          }
+          // Send the results back to the client
+          res.status(200).json(results);
+      }
+  );
+});
 
 
 
-////app.get('/myServices/:phoneNumber', (req, res) => {
-////  const phoneNumber = req.params.phoneNumber;
+ 
 
-////  // Query to fetch services based on phoneNumber
-////  db.query(
-////    'SELECT m.id AS mainServiceId, m.name AS mainServiceName, null AS subServiceId, null AS subServiceName, null AS subServicePrice ' +
-////    'FROM tbl_selected_services s ' +
-////    'JOIN tbl_salon_main_services m ON s.mainServiceId = m.id ' +
-////    'WHERE s.phoneNumber = ? ' +
-////    'UNION ' +
-////    'SELECT s.mainServiceId, m.name AS mainServiceName, s.subServiceId, sub.name AS subServiceName, sub.price AS subServicePrice ' +
-////    'FROM tbl_selected_services s ' +
-////    'JOIN tbl_salon_sub_sub_services sub ON s.subServiceId = sub.id ' +
-////    'JOIN tbl_salon_main_services m ON s.mainServiceId = m.id ' +
-////    'WHERE s.phoneNumber = ?',
-////    [phoneNumber, phoneNumber],
-////    (err, results) => {
-////      if (err) {
-////        console.error('Error fetching selected services:', err);
-////        return res.status(500).json({ error: 'Internal server error' });
-////      }
+app.get('/mainService/:subServiceId', (req, res) => {
+  const subServiceId = req.params.subServiceId;
 
-////      if (results.length === 0) {
-////        console.error('No selected services found for this phone number:', phoneNumber);
-////        return res.status(404).json({ error: 'No selected services found for this phone number.' });
-////      }
-
-////      res.status(200).json(results);
-////    }
-////  );
-////});
+  db.query(
+      'SELECT m.name FROM nkd.tbl_salon_main_services m JOIN nkd.tbl_salon_sub_sub_services s ON m.id = s.main_service_id WHERE s.id = ?',
+      [subServiceId],
+      (err, results) => {
+          if (err) {
+              console.error('Error fetching main service name:', err);
+              return res.status(500).json({ message: 'Internal server error' });
+          }
+          if (results.length === 0) {
+              return res.status(404).json({ message: 'Main service not found for the given sub-service ID' });
+          }
+          res.status(200).json(results[0]);
+      }
+  );
+});
 
 
+app.post('/saveSelectedServices', (req, res) => {
+  const { phoneNumber, selectedServices } = req.body;
 
-////app.get('/shopkeeper/selectedMainServices/:phoneNumber', (req, res) => {
-////  const phoneNumber = req.params.phoneNumber;
+  // Using callback-based approach for all queries
+  db.query('START TRANSACTION', (err) => {
+    if (err) {
+      console.error('Error starting transaction:', err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
 
-////  db.query(
-////      'SELECT DISTINCT m.id AS mainServiceId, m.name AS mainServiceName ' +
-////      'FROM tbl_selected_services s ' +
-////      'JOIN tbl_salon_main_services m ON s.mainServiceId = m.id ' +
-////      'WHERE s.phoneNumber = ?',
-////      [phoneNumber],
-////      async (err, results) => {
-////          if (err) {
-////              console.error('Error fetching selected main services:', err);
-////              return res.status(500).json({ message: 'Internal server error' });
-////          }
+    // Use a counter to handle multiple queries
+    let queriesRemaining = selectedServices.length;
 
-////          res.status(200).json(results);
-////      }
-////  );
-////});
+    selectedServices.forEach(service => {
+      db.query(
+        'INSERT INTO tbl_selected_services (phoneNumber, mainServiceId, subServiceId, price) VALUES (?, ?, ?, ?)',
+        [phoneNumber, service.mainServiceId, service.subServiceId, service.price],
+        (err) => {
+          if (err) {
+            console.error('Error inserting selected service:', err);
+            // Rollback transaction on error
+            db.query('ROLLBACK', () => {
+              res.status(500).json({ error: 'Internal server error' });
+            });
+            return;
+          }
+
+          queriesRemaining -= 1;
+
+          // Commit transaction if all queries are done
+          if (queriesRemaining === 0) {
+            db.query('COMMIT', (err) => {
+              if (err) {
+                console.error('Error committing transaction:', err);
+                res.status(500).json({ error: 'Internal server error' });
+              } else {
+                res.status(200).json({ message: 'Selected services saved successfully.' });
+              }
+            });
+          }
+        }
+      );
+    });
+  });
+});
+
+
+
+app.get('/myServices/:phoneNumber', (req, res) => {
+  const phoneNumber = req.params.phoneNumber;
+
+  // Query to fetch services based on phoneNumber
+  db.query(
+    'SELECT m.id AS mainServiceId, m.name AS mainServiceName, null AS subServiceId, null AS subServiceName, null AS subServicePrice ' +
+    'FROM tbl_selected_services s ' +
+    'JOIN tbl_salon_main_services m ON s.mainServiceId = m.id ' +
+    'WHERE s.phoneNumber = ? ' +
+    'UNION ' +
+    'SELECT s.mainServiceId, m.name AS mainServiceName, s.subServiceId, sub.name AS subServiceName, sub.price AS subServicePrice ' +
+    'FROM tbl_selected_services s ' +
+    'JOIN tbl_salon_sub_sub_services sub ON s.subServiceId = sub.id ' +
+    'JOIN tbl_salon_main_services m ON s.mainServiceId = m.id ' +
+    'WHERE s.phoneNumber = ?',
+    [phoneNumber, phoneNumber],
+    (err, results) => {
+      if (err) {
+        console.error('Error fetching selected services:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+
+      if (results.length === 0) {
+        console.error('No selected services found for this phone number:', phoneNumber);
+        return res.status(404).json({ error: 'No selected services found for this phone number.' });
+      }
+
+      res.status(200).json(results);
+    }
+  );
+});
+
+
+
+app.get('/shopkeeper/selectedMainServices/:phoneNumber', (req, res) => {
+  const phoneNumber = req.params.phoneNumber;
+
+  db.query(
+      'SELECT DISTINCT m.id AS mainServiceId, m.name AS mainServiceName ' +
+      'FROM tbl_selected_services s ' +
+      'JOIN tbl_salon_main_services m ON s.mainServiceId = m.id ' +
+      'WHERE s.phoneNumber = ?',
+      [phoneNumber],
+      async (err, results) => {
+          if (err) {
+              console.error('Error fetching selected main services:', err);
+              return res.status(500).json({ message: 'Internal server error' });
+          }
+
+          res.status(200).json(results);
+      }
+  );
+});
  
 
 
-//////new api 
+//new api 
 
-////app.get('/mainServices/:selectedSubCategory', (req, res) => {
-////  const { selectedSubCategory } = req.params;
-////  const query = `
-////    SELECT msm.id, msm.name, msm.description 
-////    FROM tbl_salon_main_services msm
-////    JOIN tbl_salon_subcategory ssc ON msm.sub_category_id = ssc.id
-////    WHERE ssc.sub_category = ?
-////  `;
+app.get('/mainServices/:selectedSubCategory', (req, res) => {
+  const { selectedSubCategory } = req.params;
+  const query = `
+    SELECT msm.id, msm.name, msm.description 
+    FROM tbl_salon_main_services msm
+    JOIN tbl_salon_subcategory ssc ON msm.sub_category_id = ssc.id
+    WHERE ssc.sub_category = ?
+  `;
 
-////  db.query(query, [selectedSubCategory], (err, results) => {
-////      if (err) {
-////          console.error('Error executing query:', err);
-////          res.status(500).json({ error: 'Failed to fetch main services' });
-////      } else {
-////          res.json(results);
-////      }
-////  });
-////});
-////app.get('/shopkeeper/selectedSubServices/:shopPhoneNumber/:mainServiceId', (req, res) => {
-////  const { shopPhoneNumber, mainServiceId } = req.params;
-////  const query = `
-////    SELECT ss.id, ss.name AS subServiceName, ts.price AS subServicePrice
-////    FROM tbl_selected_services ts
-////    JOIN tbl_salon_sub_sub_services ss ON ts.subServiceId = ss.id
-////    WHERE ts.phoneNumber = ? AND ts.mainServiceId = ?
-////  `;
+  db.query(query, [selectedSubCategory], (err, results) => {
+      if (err) {
+          console.error('Error executing query:', err);
+          res.status(500).json({ error: 'Failed to fetch main services' });
+      } else {
+          res.json(results);
+      }
+  });
+});
+app.get('/shopkeeper/selectedSubServices/:shopPhoneNumber/:mainServiceId', (req, res) => {
+  const { shopPhoneNumber, mainServiceId } = req.params;
+  const query = `
+    SELECT ss.id, ss.name AS subServiceName, ts.price AS subServicePrice
+    FROM tbl_selected_services ts
+    JOIN tbl_salon_sub_sub_services ss ON ts.subServiceId = ss.id
+    WHERE ts.phoneNumber = ? AND ts.mainServiceId = ?
+  `;
 
-////  db.query(query, [shopPhoneNumber, mainServiceId], (err, results) => {
-////      if (err) {
-////          console.error('Error executing query:', err);
-////          res.status(500).json({ error: 'Failed to fetch selected sub services' });
-////      } else {
-////          res.json(results);
-////      }
-////  });
-////});
+  db.query(query, [shopPhoneNumber, mainServiceId], (err, results) => {
+      if (err) {
+          console.error('Error executing query:', err);
+          res.status(500).json({ error: 'Failed to fetch selected sub services' });
+      } else {
+          res.json(results);
+      }
+  });
+});

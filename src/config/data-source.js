@@ -3,9 +3,9 @@ import { Category } from '../entities/Category.js';
 import { Shopkeeper } from '../entities/Shopkeeper.js';
 import { NewCustomer } from '../entities/NewCustomer.js';
 import { Session } from '../entities/Session.js';
-import { TblSalonMainServices } from '../entities/TblSalonMainServices.js';
+ 
 import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
-import { TblSalonSubSubServices } from '../entities/TblSalonSubSubServices.js';
+ 
 import { TblOrders } from '../entities/TblOrders.js';
 import { TblSalesExecutives } from '../entities/TblSalesExecutives.js';
 import { Commission } from '../entities/Commission.js';
@@ -15,10 +15,13 @@ import { TblProductMaster } from '../entities/TblProductMaster.js';
 import { TblMyProducts } from '../entities/TblMyProducts.js';
 import { ShopkeeperProducts } from '../entities/ShopkeeperProducts.js';
 import { PreferredShops } from '../entities/PreferredShops.js';
-import { TblSelectedServices } from '../entities/TblSelectedServices.js';
+ 
  
  
 import dotenv from 'dotenv';
+import {TblSalonMainServices} from '../entities/TblSalonMainServices.js';
+import {TblSelectedServices} from '../entities/TblSelectedServices.js';
+import {TblSalonSubSubServices} from '../entities/TblSalonSubSubServices.js';
 
 
 dotenv.config();
@@ -38,7 +41,8 @@ export const AppDataSource = new DataSource({
         NewCustomer,
         Session,
         TblSalonMainServices,
-        TblSalonSubcategory, 
+        TblSelectedServices,
+        TblSalonSubcategory,
         TblSalonSubSubServices,
         TblOrders,
         TblSalesExecutives,
@@ -49,7 +53,7 @@ export const AppDataSource = new DataSource({
         TblMyProducts,
         ShopkeeperProducts,
         PreferredShops,
-        TblSelectedServices,
+       
         
         
       

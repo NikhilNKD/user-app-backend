@@ -1,44 +1,78 @@
-import dotenv from 'dotenv';
-import { AppDataSource } from '../config/data-source.js';
-import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
-import { Category } from '../entities/Category.js';
+//import dotenv from 'dotenv';
+//import { AppDataSource } from '../config/data-source.js';
+//import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
 
-dotenv.config(); // Load environment variables from .env file
+//dotenv.config(); // Load environment variables from .env file
 
-const addSubCategories = async () => {
-    try {
-        console.log('Initializing the database connection...');
-        await AppDataSource.initialize();
-        console.log('Database connected successfully');
+//const subcategories = [
+//  { id: 1, categoryId: 5, name: 'Men' },
+//  { id: 2, categoryId: 5, name: 'Women' },
+//  { id: 3, categoryId: 5, name: 'Unisex' },
+//];
 
-        // Get the repository for the Category entity to find the category by ID
-        const categoryRepository = AppDataSource.getRepository(Category);
-        const category = await categoryRepository.findOneBy({ id: 5 });  // Find the category with ID 5
+//const addSubcategories = async () => {
+//  try {
+//    console.log('Initializing the database connection...');
+//    await AppDataSource.initialize();
+//    console.log('Database connected successfully');
 
-        if (!category) {
-            throw new Error('Category with ID 5 does not exist');
-        }
+//    const repository = AppDataSource.getRepository(TblSalonSubcategory);
+//    await repository.save(subcategories);
+//    console.log('Subcategories added successfully');
+//  } catch (error) {
+//    console.error('Error adding subcategories to the database:', error.message);
+//  } finally {
+//    console.log('Closing the database connection...');
+//    await AppDataSource.destroy();
+//  }
+//};
 
-        // Define the sub-categories with the associated category
-        const subCategories = [
-            { category, name: 'Men' },
-            { category, name: 'Women' },
-            { category, name: 'Unisex' }
-        ];
+//addSubcategories();
 
-        // Get the repository for the TblSalonSubcategory entity
-        const subcategoryRepository = AppDataSource.getRepository(TblSalonSubcategory);
 
-        // Save the sub-categories to the database
-        await subcategoryRepository.save(subCategories);
+// src/scripts/updateCategoryTypes.js
 
-        console.log('Sub-categories added successfully');
-    } catch (error) {
-        console.error('Error adding sub-categories:', error.message);
-    } finally {
-        console.log('Closing the database connection...');
-        await AppDataSource.destroy();
-    }
-};
+//import dotenv from 'dotenv';
+//import { AppDataSource } from '../config/data-source.js';
+//import { Category } from '../entities/Category.js';
 
-addSubCategories().catch(console.error);
+//dotenv.config(); // Load environment variables from .env file
+
+//const updateCategoryTypes = async () => {
+//  let connection;
+//  try {
+//    console.log('Initializing the database connection...');
+//    connection = await AppDataSource.initialize();
+//    console.log('Database connected successfully');
+
+//    const repository = connection.getRepository(Category);
+
+//    // Define the updates for each category
+//    const updates = [
+//      { id: 1, type: 'product' },
+//      { id: 2, type: 'product' },
+//      { id: 3, type: 'product' },
+//      { id: 4, type: 'product' },
+//      { id: 5, type: 'service' },
+//    ];
+
+//    for (const update of updates) {
+//      await repository.update(update.id, { type: update.type });
+//      console.log(`Updated category with id ${update.id} to type ${update.type}`);
+//    }
+
+//    // Verify the updates
+//    const updatedCategories = await repository.find();
+//    console.log('Updated categories:', updatedCategories);
+//  } catch (error) {
+//    console.error('Error updating categories in the database:', error.message);
+//  } finally {
+//    if (connection) {
+//      console.log('Closing the database connection...');
+//      await AppDataSource.destroy();
+//    }
+//  }
+//};
+
+//updateCategoryTypes();
+
