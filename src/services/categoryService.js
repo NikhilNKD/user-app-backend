@@ -1,4 +1,3 @@
-// src/services/categoryService.js
 import { AppDataSource } from '../config/data-source.js';
 import { Category } from '../entities/Category.js';
 import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
@@ -10,20 +9,19 @@ export const getAllCategories = async () => {
 
 export const getSubCategoriesByCategoryId = async (categoryId) => {
   const subCategoryRepo = AppDataSource.getRepository(TblSalonSubcategory);
-  return await subCategoryRepo.find({ where: { categoryId } });
+  return await subCategoryRepo.find({ where: { category_id: categoryId } });
 };
 
 export const createCategoriesService = async (data) => {
   const categoryRepo = AppDataSource.getRepository(Category);
-  const newCategory = categoryRepo.create(data);
-  return await categoryRepo.save(newCategory);
+  return await categoryRepo.save(data);
 };
 
 export const createSubCategoryService = async (data) => {
   const subCategoryRepo = AppDataSource.getRepository(TblSalonSubcategory);
-  const newSubCategory = subCategoryRepo.create(data);
-  return await subCategoryRepo.save(newSubCategory);
+  return await subCategoryRepo.save(data);
 };
+
 export const getCategoryByName = async (name) => {
   const categoryRepo = AppDataSource.getRepository(Category);
   return await categoryRepo.findOne({ where: { name } });

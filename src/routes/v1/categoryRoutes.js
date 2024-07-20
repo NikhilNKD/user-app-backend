@@ -1,6 +1,5 @@
-// src/routes/v1/categoryRoutes.js
 import { Router } from 'express';
-import { fetchCategories, fetchSubCategories, createCategories, createSubCategories,fetchCategoryByName  } from '../../controllers/categoryController.js';
+import { fetchCategories, fetchSubCategories, createCategories, createSubCategories, fetchCategoryByName } from '../../controllers/categoryController.js';
 
 const router = Router();
 
@@ -11,6 +10,3 @@ router.post('/subcategories', createSubCategories);  // Add new sub-categories
 router.get('/category', fetchCategoryByName);  // Fetch category by name
 
 export default router;
-
-
-

@@ -9,17 +9,21 @@ export const TblSalonSubcategory = new EntitySchema({
       type: 'int',
       generated: true,
     },
-    subCategory: {
+    sub_category: {  // Ensure this matches the column name in your database
       type: 'varchar',
       length: 255,
       name: 'sub_category',
     },
+    category_id: {
+      type: 'int',
+      name: 'category_id',
+    },
   },
-  //relations: {
-  //  category: {
-  //    type: 'many-to-one',
-  //    target: 'Category',
-  //    joinColumn: { name: 'category_id' },
-  //  },
-  //},
+  relations: {
+    category: {
+      type: 'many-to-one',
+      target: 'Category',
+      joinColumn: { name: 'category_id' },
+    },
+  },
 });
