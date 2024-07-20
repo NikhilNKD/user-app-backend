@@ -31,20 +31,20 @@ export const TblSalonSubSubServices = new EntitySchema({
       name: 'sub_category_id',
     },
   },
-//  relations: {
-//    mainService: {
-//      target: 'TblSalonMainServices',
-//      type: 'many-to-one',
-//      joinColumn: {
-//        name: 'main_service_id',
-//      },
-//    },
-//    //subCategory: {
-//    //  target: 'TblSalonSubcategory',
-//    //  type: 'many-to-one',
-//    //  joinColumn: {
-//    //    name: 'sub_category_id',
-//    //  },
-//    //},
-//  },
+  relations: {
+    mainService: {
+      target: 'TblSalonMainServices',
+      type: 'many-to-one',
+      joinColumn: {
+        name: 'main_service_id',
+      },
+    },
+    subCategory: {
+      target: 'TblSalonSubcategory',
+      type: 'many-to-one',
+      joinColumn: {
+        name: 'sub_category_id',
+      },
+    },
+  },
 });

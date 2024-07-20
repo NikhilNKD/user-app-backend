@@ -312,6 +312,7 @@ import { AppDataSource } from '../config/data-source.js';
 import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
 import { TblSalonMainServices } from '../entities/TblSalonMainServices.js';
 import { TblSelectedServices } from '../entities/TblSelectedServices.js';
+import { TblSalonSubSubServices } from '../entities/TblSalonSubSubServices.js'; // Import TblSalonSubSubServices
 import { Category } from '../entities/Category.js';
 
 dotenv.config();
@@ -330,12 +331,14 @@ const checkDataRemoval = async () => {
     const subcategoryRepository = queryRunner.manager.getRepository(TblSalonSubcategory);
     const mainServiceRepository = queryRunner.manager.getRepository(TblSalonMainServices);
     const selectedServicesRepository = queryRunner.manager.getRepository(TblSelectedServices);
+    const subSubServicesRepository = queryRunner.manager.getRepository(TblSalonSubSubServices); // Add repository for TblSalonSubSubServices
     const categoryRepository = queryRunner.manager.getRepository(Category);
 
     // Fetch data from tables
     const subcategories = await subcategoryRepository.find();
     const mainServices = await mainServiceRepository.find();
     const selectedServices = await selectedServicesRepository.find();
+    const subSubServices = await subSubServicesRepository.find(); // Fetch data from TblSalonSubSubServices
     const categories = await categoryRepository.find();
 
     // Log results
@@ -343,6 +346,7 @@ const checkDataRemoval = async () => {
     console.log('Subcategories:', subcategories);
     console.log('Main Services:', mainServices);
     console.log('Selected Services:', selectedServices);
+    console.log('Sub-Sub Services:', subSubServices); // Log data for TblSalonSubSubServices
 
   } catch (error) {
     console.error('Error checking data removal:', error.message);
