@@ -11,6 +11,7 @@ import shopkeeperProductsRoutes from './shopkeeperProductsRoutes.js';
 import customerOrdersRoutes from "./customerOrdersRoutes.js"
 import customerAddressRoutes from "./customerAddressRoutes.js";
 import salesExecutiveRoutes from "./salesExecutiveRoutes.js"
+//import shopkeeperServicesRoutes from "./shopkeeperServicesRoutes.js"
  
 const router = Router();
 
@@ -27,6 +28,7 @@ router.use('/shopkeeperProducts', shopkeeperProductsRoutes);
 router.use('/customerOrders', customerOrdersRoutes);
 router.use('/customerAddress', customerAddressRoutes);
 router.use('/sales', salesExecutiveRoutes);
+//router.use('/main-services', shopkeeperServicesRoutes);
  
 
 export default router;

@@ -26,4 +26,9 @@ export const TblSalonSubcategory = new EntitySchema({
       joinColumn: { name: 'category_id' },
     },
   },
+  mainServices: {
+    target: 'TblSalonMainServices',
+    type: 'one-to-many',
+    mappedBy: 'subCategory',
+  },
 });
