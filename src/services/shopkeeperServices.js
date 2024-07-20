@@ -1,5 +1,5 @@
 // src/services/mainServiceService.js
-import { getMainServicesBySubCategoryRepository } from '../repositories/shopkeeperServiceRepository';
+import { getMainServicesBySubCategoryRepository } from '../repositories/shopkeeperServiceRepository.js';
 
 export const getMainServicesBySubCategoryService = async (subCategory) => {
     try {

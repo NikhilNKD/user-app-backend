@@ -7,6 +7,6 @@ export const getMainServicesBySubCategoryRepository = async (subCategory) => {
     return await repository
         .createQueryBuilder('mainService')
         .leftJoinAndSelect('mainService.subCategory', 'subCategory')
-        .where('subCategory.subCategory = :subCategory', { subCategory })
+        .where('subCategory.sub_category = :subCategory', { subCategory }) // Use 'sub_category' here
         .getMany();
 };

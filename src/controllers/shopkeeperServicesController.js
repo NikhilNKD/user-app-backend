@@ -1,5 +1,5 @@
 // src/controllers/mainServiceController.js
-import { getMainServicesBySubCategoryService } from '../services/shopkeeperServices';
+import { getMainServicesBySubCategoryService } from '../services/shopkeeperServices.js';
 
 export const getMainServicesBySubCategory = async (req, res) => {
     const { selectedSubCategory } = req.params;
