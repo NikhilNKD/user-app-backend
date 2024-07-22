@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import fs from 'fs';
 import { Category } from '../entities/Category.js';
 import { Shopkeeper } from '../entities/Shopkeeper.js';
 import { NewCustomer } from '../entities/NewCustomer.js';
@@ -16,6 +17,9 @@ import { TblMyProducts } from '../entities/TblMyProducts.js';
 import { ShopkeeperProducts } from '../entities/ShopkeeperProducts.js';
 import { PreferredShops } from '../entities/PreferredShops.js';
 import { TblSelectedServices } from '../entities/TblSelectedServices.js';
+import { Otp } from '../entities/Otp.js';
+import { Payment } from '../entities/Payment.js';
+import { PaymentDetail } from '../entities/PaymentDetail.js';
 
 export const AppDataSource = new DataSource({
     type: "mysql",
@@ -36,15 +40,23 @@ export const AppDataSource = new DataSource({
         TblSalonSubSubServices,
         TblOrders,
         TblSalesExecutives,
-        Commission,
+        // Commission,
         CommissionLevel,
         TblCommission,
         TblProductMaster,
         TblMyProducts,
         ShopkeeperProducts,
         PreferredShops,
-        TblSelectedServices
+        TblSelectedServices,
+        Otp,
+        Payment,
+        PaymentDetail,
     ],
     migrations: [],
     subscribers: [],
+    synchronize: true,
+    // ssl: {
+    //     rejectUnauthorized: true,
+    //     ca: fs.readFileSync("ca-cert.pem"),
+    //   },
 });

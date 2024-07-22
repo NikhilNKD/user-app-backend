@@ -7,7 +7,7 @@ export const Commission = new EntitySchema({
     id: {
       primary: true,
       type: 'int',
-      generated: true,
+      generated: 'increment',
     },
     level: {
       type: 'varchar',

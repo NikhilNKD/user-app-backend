@@ -1,6 +1,7 @@
 import mysql from 'mysql2';
 import express from 'express';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import multer from 'multer';
 import cors from 'cors';
