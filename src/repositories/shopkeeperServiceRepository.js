@@ -12,10 +12,6 @@ export const getMainServicesBySubCategoryRepository = async (subCategory) => {
         .getMany();
 };
 
-
- 
-
-
 export const getSubServicesByMainServiceId = async (mainServiceId) => {
   const repository = AppDataSource.getRepository(TblSalonSubSubServices);
   return await repository

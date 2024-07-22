@@ -361,3 +361,87 @@ const checkDataRemoval = async () => {
 
 checkDataRemoval();
 
+
+
+// import { AppDataSource } from '../config/data-source.js'; // Adjust the path if needed
+// import { Category } from '../entities/Category.js'; // Adjust the path if needed
+// import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js'; // Adjust the path if needed
+// import { TblSalonMainServices } from '../entities/TblSalonMainServices.js'; // Adjust the path if needed
+// import { TblSalonSubSubServices } from '../entities/TblSalonSubSubServices.js'; // Adjust the path if needed
+
+//const insertData = async () => {
+//  let queryRunner;
+//  try {
+//    console.log('Initializing the database connection...');
+//    await AppDataSource.initialize();
+//    console.log('Database connected successfully');
+
+//    queryRunner = AppDataSource.createQueryRunner();
+//    await queryRunner.connect();
+//    await queryRunner.startTransaction();
+
+  
+//    const subcategoryRepository = queryRunner.manager.getRepository(TblSalonSubcategory);
+//    const mainServicesRepository = queryRunner.manager.getRepository(TblSalonMainServices);
+//    const subSubServicesRepository = queryRunner.manager.getRepository(TblSalonSubSubServices);
+ 
+    
+//    // Subcategories
+//    const subcategories = [
+//      { id: 1, sub_category: 'Men', category_id: 5 },
+//      { id: 2, sub_category: 'Women', category_id: 5 },
+//      { id: 3, sub_category: 'Unisex', category_id: 5 },
+//    ];
+
+//    // Insert subcategories
+//    await subcategoryRepository.save(subcategories);
+//    console.log('Inserted subcategories:', subcategories);
+
+//    // Main Services
+//    const mainServices = [
+//      { id: 1, name: 'Men Haircut', description: '', subCategoryId: 1 },
+//      { id: 2, name: 'Men Shave', description: '', subCategoryId: 1 },
+//      { id: 3, name: 'Men Hair Coloring', description: '', subCategoryId: 1 },
+//      { id: 7, name: 'Women Haircut', description: '', subCategoryId: 2 },
+//      { id: 8, name: 'Women Manicure', description: '', subCategoryId: 2 },
+//      { id: 9, name: 'Women Hair Coloring', description: '', subCategoryId: 2 },
+//      { id: 10, name: 'Unisex Haircut', description: '', subCategoryId: 3 },
+//      { id: 11, name: 'Unisex Massage', description: '', subCategoryId: 3 },
+//    ];
+
+//    // Insert main services
+//    await mainServicesRepository.save(mainServices);
+//    console.log('Inserted main services:', mainServices);
+
+//    // Sub-Sub Services
+//    const subSubServices = [
+//      { id: 1, name: 'Buzz Cut', price: '10.00', description: '', mainServiceId: 1, subCategoryId: 1 },
+//      { id: 2, name: 'Crew Cut', price: '15.00', description: '', mainServiceId: 1, subCategoryId: 1 },
+//      { id: 3, name: 'Fade Cut', price: '20.00', description: '', mainServiceId: 1, subCategoryId: 1 },
+//      { id: 4, name: 'Pompadour', price: '25.00', description: '', mainServiceId: 1, subCategoryId: 1 },
+//      { id: 5, name: 'Undercut', price: '30.00', description: '', mainServiceId: 1, subCategoryId: 1 },
+//      { id: 6, name: 'Classic Shave', price: '15.00', description: '', mainServiceId: 2, subCategoryId: 1 },
+//      { id: 7, name: 'Beard Shave', price: '20.00', description: '', mainServiceId: 2, subCategoryId: 1 },
+//      { id: 8, name: 'Goatee Shave', price: '18.00', description: '', mainServiceId: 2, subCategoryId: 1 },
+//    ];
+
+//    // Insert sub-sub services
+//    await subSubServicesRepository.save(subSubServices);
+//    console.log('Inserted sub-sub services:', subSubServices);
+
+//    await queryRunner.commitTransaction();
+//  } catch (error) {
+//    if (queryRunner) {
+//      await queryRunner.rollbackTransaction();
+//    }
+//    console.error('Error inserting data:', error.message);
+//  } finally {
+//    if (queryRunner) {
+//      await queryRunner.release();
+//    }
+//    console.log('Closing the database connection...');
+//    await AppDataSource.destroy();
+//  }
+//};
+
+//insertData();
