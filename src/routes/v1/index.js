@@ -29,6 +29,6 @@ router.use('/customerOrders', customerOrdersRoutes);
 router.use('/customerAddress', customerAddressRoutes);
 router.use('/sales', salesExecutiveRoutes);
 router.use('/services', shopkeeperServicesRoutes);
- 
+
 
 export default router;

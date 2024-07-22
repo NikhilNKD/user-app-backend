@@ -445,3 +445,51 @@ checkDataRemoval();
 //};
 
 //insertData();
+
+
+
+//import { AppDataSource } from '../config/data-source.js'; // Adjust the path if needed
+//import { Category } from '../entities/Category.js'; // Adjust the path if needed
+
+//const insertCategories = async () => {
+//  let queryRunner;
+//  try {
+//    console.log('Initializing the database connection...');
+//    await AppDataSource.initialize();
+//    console.log('Database connected successfully');
+
+//    queryRunner = AppDataSource.createQueryRunner();
+//    await queryRunner.connect();
+//    await queryRunner.startTransaction();
+
+//    const categoryRepository = queryRunner.manager.getRepository(Category);
+
+//    // Categories to insert
+//    const categories = [
+//      { id: 1, name: 'Grocery Shop', type: 'product', icon: null },
+//      { id: 2, name: 'Vegetable Shop', type: 'product', icon: null },
+//      { id: 3, name: 'Sweets Shop', type: 'product', icon: null },
+//      { id: 4, name: 'Stationary Shop', type: 'product', icon: null },
+//      { id: 5, name: 'Salon Shop', type: 'service', icon: null },
+//    ];
+
+//    // Insert categories
+//    await categoryRepository.save(categories);
+//    console.log('Inserted categories:', categories);
+
+//    await queryRunner.commitTransaction();
+//  } catch (error) {
+//    if (queryRunner) {
+//      await queryRunner.rollbackTransaction();
+//    }
+//    console.error('Error inserting categories:', error.message);
+//  } finally {
+//    if (queryRunner) {
+//      await queryRunner.release();
+//    }
+//    console.log('Closing the database connection...');
+//    await AppDataSource.destroy();
+//  }
+//};
+
+//insertCategories();

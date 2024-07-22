@@ -11,7 +11,7 @@ export const TblSelectedServices = new EntitySchema({
     },
     phoneNumber: {
       type: 'varchar',
-      length: 20, // Adjust length as needed
+      length: 20,
     },
     mainServiceId: {
       type: 'int',
@@ -33,7 +33,7 @@ export const TblSelectedServices = new EntitySchema({
       target: 'TblSalonMainServices',
       type: 'many-to-one',
       joinColumn: {
-        name: 'main_service_id',
+        name: 'sub_category_id',
       },
     },
     subService: {
