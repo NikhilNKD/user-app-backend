@@ -4,9 +4,7 @@ import { Category } from '../entities/Category.js';
 import { Shopkeeper } from '../entities/Shopkeeper.js';
 import { NewCustomer } from '../entities/NewCustomer.js';
 import { Session } from '../entities/Session.js';
-import { TblSalonMainServices } from '../entities/TblSalonMainServices.js';
 import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
-import { TblSalonSubSubServices } from '../entities/TblSalonSubSubServices.js';
 import { TblOrders } from '../entities/TblOrders.js';
 import { TblSalesExecutives } from '../entities/TblSalesExecutives.js';
 import { Commission } from '../entities/Commission.js';
@@ -20,6 +18,11 @@ import { TblSelectedServices } from '../entities/TblSelectedServices.js';
 import { Otp } from '../entities/Otp.js';
 import { Payment } from '../entities/Payment.js';
 import { PaymentDetail } from '../entities/PaymentDetail.js';
+import {TblSalonMainServices} from '../entities/TblSalonMainServices.js';
+import {TblSalonSubSubServices} from '../entities/TblSalonSubSubServices.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const AppDataSource = new DataSource({
     type: "mysql",
@@ -36,27 +39,23 @@ export const AppDataSource = new DataSource({
         NewCustomer,
         Session,
         TblSalonMainServices,
+        TblSelectedServices,
         TblSalonSubcategory,
         TblSalonSubSubServices,
         TblOrders,
         TblSalesExecutives,
-        // Commission,
+        Commission,
         CommissionLevel,
         TblCommission,
         TblProductMaster,
         TblMyProducts,
         ShopkeeperProducts,
         PreferredShops,
-        TblSelectedServices,
         Otp,
         Payment,
         PaymentDetail,
     ],
     migrations: [],
     subscribers: [],
-    synchronize: true,
-    // ssl: {
-    //     rejectUnauthorized: true,
-    //     ca: fs.readFileSync("ca-cert.pem"),
-    //   },
+   
 });

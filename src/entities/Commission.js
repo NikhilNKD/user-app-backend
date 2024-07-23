@@ -2,7 +2,7 @@ import { EntitySchema } from 'typeorm';
 
 export const Commission = new EntitySchema({
   name: 'Commission',
-  tableName: 'commission',
+  tableName: 'commission_rates',
   columns: {
     id: {
       primary: true,

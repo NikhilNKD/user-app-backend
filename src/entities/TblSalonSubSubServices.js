@@ -11,14 +11,40 @@ export const TblSalonSubSubServices = new EntitySchema({
     },
     name: {
       type: 'varchar',
+      length: 255,
     },
     price: {
       type: 'decimal',
       precision: 10,
       scale: 2,
     },
-    main_service_id: {
+    description: {
+      type: 'varchar',
+      length: 500,
+    },
+    mainServiceId: {
       type: 'int',
+      name: 'main_service_id',
+    },
+    subCategoryId: {
+      type: 'int',
+      name: 'sub_category_id',
+    },
+  },
+  relations: {
+    mainService: {
+      target: 'TblSalonMainServices',
+      type: 'many-to-one',
+      joinColumn: {
+        name: 'main_service_id',
+      },
+    },
+    subCategory: {
+      target: 'TblSalonSubcategory',
+      type: 'many-to-one',
+      joinColumn: {
+        name: 'sub_category_id',
+      },
     },
   },
 });

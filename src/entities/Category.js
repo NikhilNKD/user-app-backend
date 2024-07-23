@@ -1,4 +1,6 @@
+// src/entities/Category.js
 import { EntitySchema } from 'typeorm';
+import { TblSalonSubcategory } from './TblSalonSubcategory.js';
 
 export const Category = new EntitySchema({
   name: 'Category',
@@ -11,9 +13,22 @@ export const Category = new EntitySchema({
     },
     name: {
       type: 'varchar',
+      length: 255,
     },
     type: {
       type: 'varchar',
+      length: 50,
+    },
+    icon: {
+      type: 'varchar',
+      nullable: true,
+    },
+  },
+  relations: {
+    subCategories: {
+      type: 'one-to-many',
+      target: 'TblSalonSubcategory',
+      mappedBy: 'category',
     },
   },
 });

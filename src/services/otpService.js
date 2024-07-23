@@ -17,10 +17,12 @@ export const generateOtp = async (phoneNumber) => {
   // Check if OTP was recently sent for this phoneNumber
   const lastOtpRequest = await findOtpByPhoneNumber(phoneNumber); 
   if(lastOtpRequest){
-    removeOtp(lastOtpRequest); 
     if ((Date.now() - (lastOtpRequest.otpExpiry - (9 * 60000))) < 60000) {
+      console.log("sent recently")
       return { status: 'failed', message: 'OTP already sent recently. Please wait before requesting another OTP.' };
     }
+    console.log("lastOtpRequest", lastOtpRequest)
+    removeOtp(lastOtpRequest); 
   }
 
   let config = {
@@ -61,12 +63,13 @@ export const generateOtp = async (phoneNumber) => {
 export const validateOtp = async (phoneNumber, otp) => {
   try {
     const savedOtp = await findOtpByPhoneNumber(phoneNumber);
-
+    
     if (!savedOtp || savedOtp.otp !== otp || new Date() > savedOtp.otpExpiry) {
+      console.log("invalid")
       if (savedOtp && new Date() > savedOtp.otpExpiry) {
         await removeOtp(savedOtp); // Remove expired OTP
       }
-      throw new Error('Invalid or expired OTP');
+      return 'Invalid or expired OTP';
     }
 
     await removeOtp(savedOtp);
@@ -83,10 +86,8 @@ export const validateOtp = async (phoneNumber, otp) => {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
       expiresIn: '1h',
     });
-    return { message, token, phoneNumber: user.phoneNumber
-
-    };
+    return { message, token, phoneNumber: user.phoneNumber};
   } catch (error) {
-    throw new Error('Could not validate OTP');
+    throw new Error('Could not validate OTP', error.message);
   }
 };

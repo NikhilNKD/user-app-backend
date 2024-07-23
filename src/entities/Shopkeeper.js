@@ -16,10 +16,6 @@ export const Shopkeeper = new EntitySchema({
     shopkeeperName: {
       type: 'varchar',
     },
-    shopID: {
-      type: 'varchar',
-      nullable: true,
-    },
     pincode: {
       type: 'varchar',
       nullable: true,
@@ -45,7 +41,23 @@ export const Shopkeeper = new EntitySchema({
       type: 'varchar',
       nullable: true,
     },
+    shopBanner: {
+      type: 'varchar',
+      nullable: true,
+    },
+    profilePicture: {
+      type: 'varchar',
+      nullable: true,
+    },
     selectedSubCategory: {
+      type: 'varchar',
+      nullable: true,
+    },
+    shopID: {
+      type: 'varchar',
+      nullable: true,
+    },
+    shopType: {
       type: 'varchar',
       nullable: true,
     },

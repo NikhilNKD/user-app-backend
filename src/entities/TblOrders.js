@@ -1,3 +1,5 @@
+// src/entities/TblOrders.js
+
 import { EntitySchema } from 'typeorm';
 
 export const TblOrders = new EntitySchema({
@@ -14,10 +16,9 @@ export const TblOrders = new EntitySchema({
     },
     custPhoneNumber: {
       type: 'varchar',
-      length: 15,
     },
     cartItems: {
-      type: 'text',
+      type: 'json',
     },
     totalPrice: {
       type: 'decimal',
@@ -26,21 +27,21 @@ export const TblOrders = new EntitySchema({
     },
     selectedDate: {
       type: 'date',
+      nullable: true,
     },
     selectedTime: {
-      type: 'time',
+      type: 'varchar',
+      length: 5,  // Assuming time format like "HH:MM"
+      nullable: true,
     },
     shopID: {
       type: 'varchar',
-      nullable: true,
     },
     shopkeeperName: {
       type: 'varchar',
-      nullable: true,
     },
-    shopkeeperPhonenumber: {
+    shopkeeperPhoneNumber: {
       type: 'varchar',
-      length: 15,
     },
     created_at: {
       type: 'timestamp',

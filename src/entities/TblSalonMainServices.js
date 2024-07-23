@@ -11,14 +11,24 @@ export const TblSalonMainServices = new EntitySchema({
     },
     name: {
       type: 'varchar',
+      length: 255,
     },
     description: {
-      type: 'text',
-      nullable: true,
-    },
-    category: {
       type: 'varchar',
-      nullable: true,
+      length: 500,
+    },
+    subCategoryId: {
+      type: 'int',
+      name: 'sub_category_id',
+    },
+  },
+  relations: {
+    subCategory: {
+      target: 'TblSalonSubcategory',
+      type: 'many-to-one',
+      joinColumn: {
+        name: 'sub_category_id',
+      },
     },
   },
 });
