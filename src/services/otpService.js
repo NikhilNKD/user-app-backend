@@ -13,16 +13,20 @@ import jwt from 'jsonwebtoken';
 export const generateOtp = async (phoneNumber) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpiry = new Date(Date.now() + 10 * 60000);
-  
+  const currentTime = Date.now();
+
   // Check if OTP was recently sent for this phoneNumber
   const lastOtpRequest = await findOtpByPhoneNumber(phoneNumber); 
   if(lastOtpRequest){
-    if ((Date.now() - (lastOtpRequest.otpExpiry - (9 * 60000))) < 60000) {
-      console.log("sent recently")
-      return { status: 'failed', message: 'OTP already sent recently. Please wait before requesting another OTP.' };
+    const timeSinceLastOtp = currentTime - (new Date(lastOtpRequest.otpExpiry).getTime() - (9 * 60000));
+    const recentOtpThreshold = 0; // 1 minute in milliseconds
+    if (timeSinceLastOtp < recentOtpThreshold) {
+      return {
+        status: 'failed',
+        message: 'OTP already sent recently. Please wait before requesting another OTP.'
+      };
     }
-    console.log("lastOtpRequest", lastOtpRequest)
-    removeOtp(lastOtpRequest); 
+    await removeOtp(lastOtpRequest); 
   }
 
   let config = {
@@ -40,7 +44,6 @@ export const generateOtp = async (phoneNumber) => {
         messageData.ErrorCode === '000' &&
         messageData.ErrorMessage === 'Success'
       ) {
-        console.log("here")
         await saveOtp({ phoneNumber, otp, otpExpiry });
         return { status: 'success', message: 'OTP sent successfully' };
       } else {
@@ -63,9 +66,8 @@ export const generateOtp = async (phoneNumber) => {
 export const validateOtp = async (phoneNumber, otp) => {
   try {
     const savedOtp = await findOtpByPhoneNumber(phoneNumber);
-    
+
     if (!savedOtp || savedOtp.otp !== otp || new Date() > savedOtp.otpExpiry) {
-      console.log("invalid")
       if (savedOtp && new Date() > savedOtp.otpExpiry) {
         await removeOtp(savedOtp); // Remove expired OTP
       }
