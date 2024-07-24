@@ -961,7 +961,7 @@ async function checkAndAssignCommission(salesAssociateNumber) {
   }
 }
 
-
+//register sales executive
 app.post('/submit-form', (req, res) => {
   const { firstName, lastName, mobileNumber, pincode } = req.body;
   const commissionLevel = 'L0'; 
@@ -977,6 +977,8 @@ app.post('/submit-form', (req, res) => {
   });
 });
 
+
+//team member add
 app.post('/submit-team-member', (req, res) => {
   const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy } = req.body;
   
@@ -995,7 +997,7 @@ app.post('/submit-team-member', (req, res) => {
   });
 })
 
-
+//info about team member
 app.get('/my-team/:mobileNumber', (req, res) => {
   const { mobileNumber } = req.params;
   const sql = 'SELECT * FROM tbl_salesexecutives WHERE addedBy = ?';
@@ -1010,7 +1012,7 @@ app.get('/my-team/:mobileNumber', (req, res) => {
   });
 });
 
-
+//profile
 app.get('/my-profile/:mobileNumber', (req, res) => {
   const mobileNumber = req.params.mobileNumber;
   const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
