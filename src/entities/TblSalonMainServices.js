@@ -1,4 +1,5 @@
 import { EntitySchema } from 'typeorm';
+import { TblSalonSubcategory } from './TblSalonSubcategory.js'; // Ensure the correct path
 
 export const TblSalonMainServices = new EntitySchema({
   name: 'TblSalonMainServices',

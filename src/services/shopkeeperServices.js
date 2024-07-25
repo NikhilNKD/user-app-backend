@@ -50,7 +50,6 @@ export const saveSelectedServicesService = async (phoneNumber, selectedServices)
 };
 
 
-
 export const getSelectedSubServicesService = async (shopPhoneNumber, mainServiceId) => {
   try {
       const subServices = await getSelectedSubServicesRepository(shopPhoneNumber, mainServiceId);

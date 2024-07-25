@@ -58,6 +58,6 @@ export const getSelectedSubServicesRepository = async (shopPhoneNumber, mainServ
       .leftJoinAndSelect('selectedServices.subService', 'subService')
       .where('selectedServices.phoneNumber = :phoneNumber', { phoneNumber: shopPhoneNumber })
       .andWhere('selectedServices.mainServiceId = :mainServiceId', { mainServiceId })
-      .select(['subService.id', 'subService.name', 'selectedServices.price'])
+      .select(['subService.id', 'subService.name', 'selectedServices.price', 'selectedServices.phoneNumber']) // Ensure this is included
       .getMany();
 };
