@@ -1,9 +1,14 @@
 import { findUserByPhoneNumber, saveUser,saveCustomer, checkPhoneNumberInDatabases } from '../repositories/authRepository.js';
-
+import { AppDataSource } from '../config/data-source.js';
  
 import { Category } from '../entities/Category.js';
 
 export const loginService = async (phoneNumber, userType) => {
+    if (userType === 'unregistered') {
+        // Handle unregistered user case directly
+        return { phoneNumber, userType, status: 'unregistered' };
+    }
+
     const user = await findUserByPhoneNumber(phoneNumber, userType);
     if (!user) {
         throw new Error('User not found');
@@ -27,6 +32,7 @@ export const loginService = async (phoneNumber, userType) => {
 
     return { phoneNumber, userType };
 };
+
 
 export const registerService = async (userData) => {
     try {

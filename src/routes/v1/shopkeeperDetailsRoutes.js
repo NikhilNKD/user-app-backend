@@ -4,7 +4,8 @@ import {
     getShopkeeperDetailsByPhoneNumberController,
     getShopkeeperDetailsByShopIDController,
     getShopkeeperServiceDetailsController,
-    getShopkeeperProductHomeDetailsController
+    getShopkeeperProductHomeDetailsController,
+    getShopkeeper
 } from '../../controllers/shopkeeperDetailsController.js';
 
 const router = Router();
@@ -21,4 +22,5 @@ router.get('/service/:phoneNumber', getShopkeeperServiceDetailsController);
 // Route to get shopkeeper product home details
 router.get('/productHome/:phoneNumber', getShopkeeperProductHomeDetailsController); 
 
+router.get('/shopkeeper', getShopkeeper);
 export default router;

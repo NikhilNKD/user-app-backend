@@ -3,7 +3,8 @@ import {
     getShopkeeperDetailsByPhoneNumber,
     getShopkeeperDetailsByShopID,
     getShopkeeperServiceDetailsByPhoneNumber,
-    getShopkeeperProductHomeDetailsByPhoneNumber
+    getShopkeeperProductHomeDetailsByPhoneNumber,
+    findShopkeeperByPhoneNumber
 } from '../repositories/shopkeeperDetailsRepository.js';
 
 // Get shopkeeper details by phone number
@@ -97,4 +98,11 @@ export const getShopkeeperProductHomeDetailsByPhoneNumberService = async (phoneN
         console.error('Service Error:', error);  // Debugging statement
         throw new Error('Error fetching shopkeeper product home details: ' + error.message);
     }
+};
+
+
+ 
+
+export const getShopkeeperByPhoneNumber = async (phoneNumber) => {
+  return await findShopkeeperByPhoneNumber(phoneNumber);
 };

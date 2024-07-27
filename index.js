@@ -477,27 +477,27 @@ app.use('/api', routes);
 ////  });
 ////});
 
-////app.get('/shopkeeper', (req, res) => {
-////  const phoneNumber = req.query.phoneNumber;
+app.get('/shopkeeper', (req, res) => {
+  const phoneNumber = req.query.phoneNumber;
 
-////  if (!phoneNumber) {
-////    return res.status(400).json({ error: 'Phone number is required' });
-////  }
+  if (!phoneNumber) {
+    return res.status(400).json({ error: 'Phone number is required' });
+  }
 
-////  db.query(
-////    'SELECT * FROM shopkeepers WHERE phoneNumber = ?',
-////    [phoneNumber],
-////    (err, results) => {
-////      if (err) {
-////        return res.status(500).json({ error: 'Database query failed' });
-////      }
-////      if (results.length === 0) {
-////        return res.status(404).json({ error: 'Shopkeeper not found' });
-////      }
-////      res.json(results[0]);
-////    }
-////  );
-//// });
+  db.query(
+    'SELECT * FROM shopkeepers WHERE phoneNumber = ?',
+    [phoneNumber],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database query failed' });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Shopkeeper not found' });
+      }
+      res.json(results[0]);
+    }
+  );
+ });
 
 
 
@@ -1188,7 +1188,9 @@ app.get('/total-commission/:mobileNumber', (req, res) => {
   });
 });
 
-
+//base 500 ---> shops-rregotsr -- 500+250 => 750+150=>900  --> sir --> 500+250=750 -->sunil -->500
+//L1 : 250 --
+//L2 : 150
 app.get('/user-level/:mobileNumber', (req, res) => {
   const { mobileNumber } = req.params;
   const sql = 'SELECT level FROM nkd.tbl_salesexecutives WHERE mobileNo = ?';

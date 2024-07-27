@@ -30,3 +30,7 @@ export const getShopkeeperProductHomeDetailsByPhoneNumber = async (phoneNumber) 
         select: ['shopkeeperName', 'shopID', 'pincode', 'shopState', 'city', 'address', 'salesAssociateNumber', 'selectedCategory', 'selectedSubCategory'],
     });
 };
+const shopkeeperRepository = AppDataSource.getRepository(Shopkeeper);
+export const findShopkeeperByPhoneNumber = async (phoneNumber) => {
+    return await shopkeeperRepository.findOneBy({ phoneNumber });
+  };

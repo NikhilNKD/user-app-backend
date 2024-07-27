@@ -2,7 +2,8 @@ import {
     getShopkeeperDetailsByPhoneNumberService,
     getShopkeeperDetailsByShopIDService,
     getShopkeeperServiceDetailsByPhoneNumberService,
-    getShopkeeperProductHomeDetailsByPhoneNumberService
+    getShopkeeperProductHomeDetailsByPhoneNumberService,
+    getShopkeeperByPhoneNumber 
 } from '../services/shopkeeperDetailsService.js';
 
 // Get shopkeeper details by phone number
@@ -71,3 +72,22 @@ export const getShopkeeperProductHomeDetailsController = async (req, res) => {
         });
     }
 };
+
+
+export const getShopkeeper = async (req, res) => {
+    const phoneNumber = req.query.phoneNumber;
+  
+    if (!phoneNumber) {
+      return res.status(400).json({ error: 'Phone number is required' });
+    }
+  
+    try {
+      const shopkeeper = await getShopkeeperByPhoneNumber(phoneNumber);
+      if (!shopkeeper) {
+        return res.status(404).json({ error: 'Shopkeeper not found' });
+      }
+      res.json(shopkeeper);
+    } catch (error) {
+      res.status(500).json({ error: 'Database query failed', details: error.message });
+    }
+  };
