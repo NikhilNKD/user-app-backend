@@ -1,4 +1,3 @@
-import mysql from 'mysql2';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -12,18 +11,6 @@ import { AppDataSource } from './src/config/data-source.js';
 import routes from './src/routes/index.js';
 const PORT = process.env.PORT || 3000;
 const app = express();
-
-const db = mysql.createConnection({
- host:process.env.DB_HOST,
- user: process.env.DB_USER,
- password: process.env.DB_PASSWORD,
- database: process.env.DB_NAME,
- port: process.env.DB_PORT,
- ssl: {
-   rejectUnauthorized: true,
-   ca: fs.readFileSync("ca-cert.pem"),
- },
-});
  
 app.use(cors({
   origin: '*',  // Allow requests from any origin
@@ -40,14 +27,6 @@ AppDataSource.initialize()
     console.log('Database connected successfully using App Data Source');
   })
   .catch((error) => console.log('Database connection error:', error));
-
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to the database:', err);
-        return;
-    }
-    console.log('Connected to the database');
-});
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
