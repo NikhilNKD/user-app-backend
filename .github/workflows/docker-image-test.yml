@@ -46,7 +46,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.NKD_SERVER_PEM }}
           script: |
-            cd /ubuntu/dev
+            cd /dev
             docker-compose pull
             docker-compose up -d
             docker image prune -af
