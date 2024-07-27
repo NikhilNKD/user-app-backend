@@ -47,7 +47,7 @@ jobs:
           key: ${{ secrets.NKD_SERVER_PEM }}
           script: |
             cd /dev
-            docker compose pull
-            docker compose up -d
+            docker compose -f docker-compose-nkd.yml pull
+            docker compose -f docker-compose-nkd.yml up -d
             docker image prune -af
           
