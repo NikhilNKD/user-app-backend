@@ -3,7 +3,7 @@ name: Docker Deploy on NKD Test
 on:
   workflow_run:
     workflows: [Create and publish a Docker image for nkd test]
-    branches: [test]
+    branches: ['test']
     types:
       - completed
 
