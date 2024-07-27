@@ -31,15 +31,15 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-      - name: Deploy
+      # - name: Build and push Docker image
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     file: ./Dockerfile
+      #     push: true
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+      - name: Deploy in Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.NKD_SERVER_HOST }}
@@ -47,8 +47,7 @@ jobs:
           key: ${{ secrets.NKD_SERVER_PEM }}
           script: |
             pwd
-            cd /dev
-            docker compose -f docker-compose-nkd.yml pull
-            docker compose -f docker-compose-nkd.yml up -d
+            cd /home/ubuntu/dev
+            docker-compose -f docker-compose-nkd.yml pull
+            docker-compose -f docker-compose-nkd.yml up -d
             docker image prune -af
-          
