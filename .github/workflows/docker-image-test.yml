@@ -43,10 +43,10 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.NKD_SERVER_HOST }}
-          username: root
+          username: ubuntu
           key: ${{ secrets.NKD_SERVER_PEM }}
           script: |
-            cd /root/dev
+            cd /ubuntu/dev
             docker-compose pull
             docker-compose up -d
             docker image prune -af
