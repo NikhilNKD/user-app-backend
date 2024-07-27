@@ -46,6 +46,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.NKD_SERVER_PEM }}
           script: |
+            pwd
             cd /dev
             docker compose -f docker-compose-nkd.yml pull
             docker compose -f docker-compose-nkd.yml up -d
