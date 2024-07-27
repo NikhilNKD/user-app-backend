@@ -48,6 +48,6 @@ jobs:
           script: |
             pwd
             cd /home/ubuntu/dev
-            docker-compose -f docker-compose-nkd.yml pull
-            docker-compose -f docker-compose-nkd.yml up -d
+            docker compose -f docker-compose-nkd.yml pull
+            docker compose -f docker-compose-nkd.yml up -d
             docker image prune -af
