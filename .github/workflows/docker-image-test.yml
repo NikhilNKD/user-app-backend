@@ -39,3 +39,15 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.NKD_SERVER_HOST }}
+          username: root
+          key: ${{ secrets.NKD_SERVER_PEM }}
+          script: |
+            cd /root/dev
+            docker-compose pull
+            docker-compose up -d
+            docker image prune -af
+          
