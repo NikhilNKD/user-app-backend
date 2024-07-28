@@ -29,8 +29,11 @@ import {
   
   export const placeOrderController = async (req, res) => {
 	try {
-	  const { custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, created_at, customerName } = req.body;
-	  const result = await placeOrderService(custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, created_at, customerName);
+		const { custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, customerName, shopkeeperPhoneNumber } = req.body;
+		// console.log("jere", custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, created_at, customerName )
+		if(!custPhoneNumber || !shopID || !cartItems || !totalPrice || !selectedDate || !selectedDate  || !customerName || !shopkeeperPhoneNumber)return res.status(400).json({ success: false, message: 'Missing required fields' });
+	
+	  const result = await placeOrderService(custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, customerName, shopkeeperPhoneNumber);
 	  res.json(result);
 	} catch (error) {
 	  console.error('Error in placeOrderController:', error);

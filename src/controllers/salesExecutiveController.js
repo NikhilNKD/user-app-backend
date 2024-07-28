@@ -1,4 +1,4 @@
-import { calculateTotalCommissionService, checkSalesAssociateService, checkUserService, getCommissionByLevelService, getTotalCommissionService, getUserLevelService, updateShopkeeperProfileService } from '../services/salesExecutiveService.js';
+import { calculateTotalCommissionService, checkSalesAssociateService, checkUserService, getCommissionByLevelService, getMyTeamService, getProfileService, getShopsService, getTotalCommissionService, getUserLevelService, submitTeamMemberService, updateProfileService, updateShopkeeperProfileService } from '../services/salesExecutiveService.js';
 import { submitFormService , registerSalesService} from '../services/salesExecutiveService.js';
 import { uploadImage } from '../services/s3Service.js';
 export const checkUserController = async (req, res) => {
@@ -34,6 +34,119 @@ export const submitFormController = async (req, res) => {
 	  console.error('Error in submitFormController:', error);
 	  res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
 	}
+  };
+
+  export const submitTeamMemberController = async (req, res) => {
+    const { phoneNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy } = req.body;
+    
+    // New team members should be assigned level base by default
+    const level = 'L1';
+  
+    try {
+      if (!phoneNumber || !firstName  || !pincode || !addedBy) {
+        console.log(phoneNumber, firstName, lastName, pincode, addedBy,'---')
+        return res.status(400).json({ error: 'All required fields must be provided' });
+      }
+  
+      const result = await submitTeamMemberService({ phoneNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level });
+  
+      if (result?.message) {
+        res.json({ success: true, message: result.message });
+      }else if (result?.error){
+        return res.status(400).json({ success: false, error: result.error });
+      } else {
+        res.status(400).json({success: false, error: 'Failed to add team member' });
+      }
+    } catch (error) {
+      console.error('Error submitting team member:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+  export const getMyTeamController = async (req, res) => {
+    const { phoneNumber } = req.params;
+    try {
+      const teamMembers = await getMyTeamService(phoneNumber);
+
+      if (teamMembers && teamMembers.message.length > 0 && teamMembers?.message) {
+        res.json({ success: true, message: result.message });
+      } 
+      else if (teamMembers && teamMembers.message.length === 0) {
+        return res.status(404).json({ success: false, message: [] });
+      } 
+      else if (teamMembers?.error){
+        return res.status(400).json({ success: false, error: result.error });
+      } else {
+        res.status(400).json({success: false, error: 'Failed to check team member' });
+      }
+      // res.json(teamMembers);
+    } catch (error) {
+      console.error('Error fetching team data:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+
+  export const getProfileController = async (req, res) => {
+    const { phoneNumber } = req.params;
+
+    try {
+      const result = await getProfileService(phoneNumber);
+
+      if (result && result.message) {
+        res.json({ success: true, message: result.message });
+      } 
+      else if (result && result.error){
+        return res.status(400).json({ success: false, error: result.error });
+      } else {
+        res.status(400).json({success: false, error: 'Failed to get user Profile' });
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      res.status(500).json({ message: 'Error fetching profile' });
+    }
+  };
+
+  export const updateProfileController = async (req, res) => {
+    const { phoneNumber, firstName, lastName, pincode, aadhar, upi, pancard } = req.body;
+  
+    try {
+      const result = await updateProfileService(phoneNumber, { firstName, lastName, pincode, aadhar, upi, pancard });
+  
+      if (result && result.message) {
+        res.json({ success: true, message: result.message });
+      } 
+      else if (result && result.error){
+        return res.status(400).json({ success: false, error: result.error });
+      } else {
+        res.status(400).json({success: false, error: 'Failed to get user Profile' });
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      res.status(500).json({ message: 'Error updating profile' });
+    }
+  };
+
+
+  export const getShopsController = async (req, res) => {
+    const { salesAssociateNumber } = req.query;
+
+    try {
+      const result = await getShopsService(salesAssociateNumber);
+      
+      if (result && result.message) {
+        res.json({ success: true, message: result.message });
+      } 
+      else if (result && result.error){
+        return res.status(400).json({ success: false, error: result.error });
+      } else {
+        res.status(400).json({success: false, error: 'Failed to get user Profile' });
+      }
+      // res.status(200).json(shops);
+    } catch (error) {
+      console.error('Error fetching shops:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
   };
 
   export const getTotalCommissionController = async (req, res) => {

@@ -1,6 +1,6 @@
 // src/services/salesExecutiveService.js
 
-import { checkUserRepository,submitFormRepository,getShopkeeperRepo, getSalesExecutiveRepos, getCommissionRepo, getTblCommissionRepo, updateShopkeeperProfileRepository, checkSalesAssociateRepository, getCommissionByLevelRepository, getUserLevelRepository  } from '../repositories/salesExecutiveRepository.js';
+import { checkUserRepository,submitFormRepository,getShopkeeperRepo, getSalesExecutiveRepos, getCommissionRepo, getTblCommissionRepo, updateShopkeeperProfileRepository, checkSalesAssociateRepository, getCommissionByLevelRepository, getUserLevelRepository, getUserLevelAndAddedByRepository, getCommissionAmountRepository, getCommissionAdjustmentRepository, submitTeamMemberRepository, getMyTeamRepository, getProfileRepository, updateProfileRepository, getShopsRepository  } from '../repositories/salesExecutiveRepository.js';
 import { AppDataSource } from '../config/data-source.js';
 import { uploadImage } from './s3Service.js';
 
@@ -18,6 +18,72 @@ import { uploadImage } from './s3Service.js';
 	} catch (error) {
 	  throw new Error('Error in submitFormService: ' + error.message);
 	}
+  };
+
+  export const submitTeamMemberService = async (teamMemberData) => {
+    try {
+      console.log(teamMemberData, teamMemberData.addedBy);
+      const addedBy = await checkUserRepository(teamMemberData.addedBy); 
+      const checkMember = await checkUserRepository(teamMemberData.phoneNumber); 
+      if(!addedBy){
+        return {error: "addedBy not exists"}
+      }
+      if(checkMember){
+        return {error: "user exists"}
+      }
+      const newMemberAdded =  await submitTeamMemberRepository(teamMemberData);
+      if(newMemberAdded){
+        return {message: "Successfully added"}
+      }
+      return false;
+    } catch (error) {
+      throw new Error('Error in submitTeamMemberService: ' + error.message);
+    }
+  };
+
+  export const getMyTeamService = async (phoneNumber) => {
+    try {
+      const checkUser = await checkUserRepository(phoneNumber); 
+      if (!checkUser) return {error: "user not exists"}
+      const team =  await getMyTeamRepository(phoneNumber);
+      return {message: team}
+    } catch (error) {
+      throw new Error('Error in getMyTeamService: ' + error.message);
+    }
+  };
+
+  export const getProfileService = async (phoneNumber) => {
+    try {
+      // const checkUser = await checkUserRepository(phoneNumber); 
+      // if (!checkUser) return {error: "user not exists"}
+      const data =  await getProfileRepository(phoneNumber);
+      if (!data) return {error: "user not exists"}
+      return {message: data}
+    } catch (error) {
+      throw new Error('Error in getProfileService: ' + error.message);
+    }
+  };
+
+  export const updateProfileService = async (phoneNumber, updates) => {
+    try {
+      // const checkUser = await checkUserRepository(phoneNumber); 
+      // if (!checkUser) return {error: "user not exists"}
+      const data =  await updateProfileRepository(phoneNumber, updates);
+      if(!data) return {error: "Profile not found"}
+      return {message: "Profile updated successfully"}
+    } catch (error) {
+      throw new Error('Error in updateProfileService: ' + error.message);
+    }
+  };
+
+  export const getShopsService = async (salesAssociateNumber) => {
+    try {
+      const data =  await getShopsRepository(salesAssociateNumber);
+      if(!(data.length > 0)) return {error: "data not found"}
+      return {message: data};
+    } catch (error) {
+      throw new Error('Error in getShopsService: ' + error.message);
+    }
   };
 
   export const getTotalCommissionService = async (mobileNumber, res) => {
@@ -91,21 +157,24 @@ import { uploadImage } from './s3Service.js';
   export const calculateTotalCommissionService = async (mobileNumber) => {
     try {
       const user = await getUserLevelAndAddedByRepository(mobileNumber);
-      
+      console.log(user, "__-")
       if (!user) {
         return null;
       }
-  
       const { level, addedBy } = user;
-  
+      
+      if(level === null){
+        return {"error": "level is missing"}
+      }
       const individualCommission = await getCommissionAmountRepository(level);
   
       if (individualCommission === null) {
         return null;
       }
-  
+      console.log("here", individualCommission)
       const adjustment = await getCommissionAdjustmentRepository(addedBy, level);
-  
+      console.log(adjustment, "-of-so");
+      return adjustment
       const shopCount = await getShopCountRepository(mobileNumber);
   
       let totalCommission = 0;
@@ -136,7 +205,7 @@ import { uploadImage } from './s3Service.js';
       throw new Error('Error in calculateTotalCommissionService: ' + error.message);
     }
   };
-  
+
   export const registerSalesService = async (shopkeeperData) => {
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
@@ -200,22 +269,22 @@ export const checkAndAssignCommission = async (salesAssociateNumber, transaction
         const commissionRates = await fetchCommissionRates(transactionalEntityManager);
 
         // Assign commission to the sales associate
-        const commissionAmountBase = commissionRates['Base'];
-        await assignCommission(salesAssociateNumber, 'Base', commissionAmountBase, transactionalEntityManager);
+        const commissionAmountBase = commissionRates['L1'];
+        await assignCommission(salesAssociateNumber, 'L1', commissionAmountBase, transactionalEntityManager);
 
         // If the sales associate was added by someone, assign additional commission
         if (addedBy) {
-            const commissionAmountL1 = commissionRates['L1'];
-            await assignCommission(addedBy, 'L1', commissionAmountL1, transactionalEntityManager);
+            const commissionAmountL1 = commissionRates['L2'];
+            await assignCommission(addedBy, 'L2', commissionAmountL1, transactionalEntityManager);
 
             // Check if the person who added the sales associate was also added by someone
             const addedBySalesAssociate = await salesAssociateRepo.findOne({ where: { phoneNumber: addedBy } });
 
             if (addedBySalesAssociate && addedBySalesAssociate.addedBy) {
-                const commissionAmountL2 = commissionRates['L2'];
-                await assignCommission(addedBySalesAssociate.addedBy, 'L2', commissionAmountL2, transactionalEntityManager);
+                const commissionAmountL2 = commissionRates['L3'];
+                await assignCommission(addedBySalesAssociate.addedBy, 'L3', commissionAmountL2, transactionalEntityManager);
             } else {
-                console.warn(`No further addedBy found for ${addedBy}, skipping L2 commission assignment.`);
+                console.warn(`No further addedBy found for ${addedBy}, skipping L3 commission assignment.`);
             }
         }
     } catch (error) {

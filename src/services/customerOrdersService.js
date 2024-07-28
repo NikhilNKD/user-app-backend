@@ -14,9 +14,10 @@ export const saveOrderService = async (custName, custPhoneNumber, cartItems, tot
 	}
   };
 
-export const placeOrderService = async (custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, created_at, customerName) => {
+export const placeOrderService = async (custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, customerName, shopkeeperPhoneNumber) => {
   try {
-    return await placeOrderRepository(custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, created_at, customerName);
+    const data  = await placeOrderRepository(custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, customerName, shopkeeperPhoneNumber);
+    return data
   } catch (error) {
     throw new Error('Error in placeOrderService: ' + error.message);
   }

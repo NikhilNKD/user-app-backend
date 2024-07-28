@@ -58,6 +58,7 @@ export const Shopkeeper = new EntitySchema({
     shopID: {
       type: 'varchar',
       nullable: true,
+      unique: true,
     },
     shopType: {
       type: 'varchar',

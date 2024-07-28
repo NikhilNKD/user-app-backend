@@ -24,7 +24,7 @@ export const saveOrderRepository = async (custName, custPhoneNumber, cartItems, 
 	}
   };
 
-export const placeOrderRepository = async (custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, created_at, customerName) => {
+export const placeOrderRepository = async (custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, customerName, shopkeeperPhoneNumber) => {
   try {
     const orderRepository = AppDataSource.getRepository(TblOrders);
     const order = orderRepository.create({
@@ -34,9 +34,10 @@ export const placeOrderRepository = async (custPhoneNumber, shopID, cartItems, t
       totalPrice,
       selectedDate,
       selectedTime,
-      created_at,
       customerName,
+      shopkeeperPhoneNumber,
     });
+    console.log(order, "fslklkl")
     await orderRepository.save(order);
     return { success: true, message: 'Order placed successfully' };
   } catch (error) {

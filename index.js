@@ -960,107 +960,107 @@ async function checkAndAssignCommission(salesAssociateNumber) {
 
 
 //team member add
-app.post('/submit-team-member', (req, res) => {
-  const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy } = req.body;
+// app.post('/submit-team-member', (req, res) => {
+//   const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy } = req.body;
   
-  // New team members should be assigned level L0 by default
-  const level = 'L0';
+//   // New team members should be assigned level L0 by default
+//   const level = 'L0';
 
-  const insertSql = 'INSERT INTO tbl_salesexecutives (mobileNo, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-  db.query(insertSql, [mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level], (err, result) => {
-      if (err) {
-          console.error('Error saving data to database:', err);
-          res.status(500).json({ error: 'Internal server error' });
-          return;
-      }
-      console.log('Team member added successfully');
-      res.json({ success: true });
-  });
-})
+//   const insertSql = 'INSERT INTO tbl_salesexecutives (mobileNo, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+//   db.query(insertSql, [mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level], (err, result) => {
+//       if (err) {
+//           console.error('Error saving data to database:', err);
+//           res.status(500).json({ error: 'Internal server error' });
+//           return;
+//       }
+//       console.log('Team member added successfully');
+//       res.json({ success: true });
+//   });
+// })
 
 //info about team member
-app.get('/my-team/:mobileNumber', (req, res) => {
-  const { mobileNumber } = req.params;
-  const sql = 'SELECT * FROM tbl_salesexecutives WHERE addedBy = ?';
-  db.query(sql, [mobileNumber], (err, result) => {
-    if (err) {
-      console.error('Error fetching data from database:', err);
-      res.status(500).json({ error: 'Internal server error' });
-      return;
-    }
-    console.log('Data fetched successfully');
-    res.json(result);
-  });
-});
+// app.get('/my-team/:mobileNumber', (req, res) => {
+//   const { mobileNumber } = req.params;
+//   const sql = 'SELECT * FROM tbl_salesexecutives WHERE addedBy = ?';
+//   db.query(sql, [mobileNumber], (err, result) => {
+//     if (err) {
+//       console.error('Error fetching data from database:', err);
+//       res.status(500).json({ error: 'Internal server error' });
+//       return;
+//     }
+//     console.log('Data fetched successfully');
+//     res.json(result);
+//   });
+// });
 
 //profile
-app.get('/my-profile/:mobileNumber', (req, res) => {
-  const mobileNumber = req.params.mobileNumber;
-  const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
-  db.query(sql, [mobileNumber], (err, result) => {
-    if (err) {
-      console.error('Error fetching profile:', err);
-      res.status(500).send('Error fetching profile');
-      return;
-    }
-    if (result.length === 0) {
-      res.status(404).send('Profile not found');
-      return;
-    }
-    res.status(200).json(result[0]);
-  });
-});
+// app.get('/my-profile/:mobileNumber', (req, res) => {
+//   const mobileNumber = req.params.mobileNumber;
+//   const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
+//   db.query(sql, [mobileNumber], (err, result) => {
+//     if (err) {
+//       console.error('Error fetching profile:', err);
+//       res.status(500).send('Error fetching profile');
+//       return;
+//     }
+//     if (result.length === 0) {
+//       res.status(404).send('Profile not found');
+//       return;
+//     }
+//     res.status(200).json(result[0]);
+//   });
+// });
 
 // Route to update user's profile
-app.post('/update-profile', (req, res) => {
-  const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard } = req.body;
-  const sql = 'UPDATE tbl_salesexecutives SET firstName = ?, lastName = ?, pincode = ?, aadhar = ?, upi = ?, pancard = ? WHERE mobileNo = ?';
-  db.query(sql, [firstName, lastName, pincode, aadhar, upi, pancard, mobileNumber], (err, result) => {
-    if (err) {
-      console.error('Error updating profile:', err);
-      res.status(500).send('Error updating profile');
-      return;
-    }
-    console.log('Profile updated successfully');
-    res.status(200).send('Profile updated successfully');
-  });
-});
+// app.post('/update-profile', (req, res) => {
+//   const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard } = req.body;
+//   const sql = 'UPDATE tbl_salesexecutives SET firstName = ?, lastName = ?, pincode = ?, aadhar = ?, upi = ?, pancard = ? WHERE mobileNo = ?';
+//   db.query(sql, [firstName, lastName, pincode, aadhar, upi, pancard, mobileNumber], (err, result) => {
+//     if (err) {
+//       console.error('Error updating profile:', err);
+//       res.status(500).send('Error updating profile');
+//       return;
+//     }
+//     console.log('Profile updated successfully');
+//     res.status(200).send('Profile updated successfully');
+//   });
+// });
 
 
-app.get('/shops', (req, res) => {
-  const { salesAssociateNumber } = req.query;
-  const query = `
-      SELECT * 
-      FROM shopkeeper 
-      WHERE salesAssociateNumber = ?;
-  `;
-  db.query(query, [salesAssociateNumber], (error, results) => {
-      if (error) {
-          console.error('Error fetching shops:', error);
-          res.status(500).json({ error: 'Internal Server Error' });
-          return;
-      }
-      res.json(results);
-  });
-});
+// app.get('/shops', (req, res) => {
+//   const { salesAssociateNumber } = req.query;
+//   const query = `
+//       SELECT * 
+//       FROM shopkeeper 
+//       WHERE salesAssociateNumber = ?;
+//   `;
+//   db.query(query, [salesAssociateNumber], (error, results) => {
+//       if (error) {
+//           console.error('Error fetching shops:', error);
+//           res.status(500).json({ error: 'Internal Server Error' });
+//           return;
+//       }
+//       res.json(results);
+//   });
+// });
 
-app.post('/check-user', (req, res) => {
-  const { mobileNumber } = req.body;
-  const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
-  db.query(sql, [mobileNumber], (err, results) => {
-    if (err) {
-      console.error('Error checking user:', err);
-      res.status(500).json({ error: 'Internal server error' });
-      return;
-    }
+// app.post('/check-user', (req, res) => {
+//   const { mobileNumber } = req.body;
+//   const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
+//   db.query(sql, [mobileNumber], (err, results) => {
+//     if (err) {
+//       console.error('Error checking user:', err);
+//       res.status(500).json({ error: 'Internal server error' });
+//       return;
+//     }
 
-    if (results.length > 0) {
-      res.json({ exists: true });
-    } else {
-      res.json({ exists: false });
-    }
-  });
-});
+//     if (results.length > 0) {
+//       res.json({ exists: true });
+//     } else {
+//       res.json({ exists: false });
+//     }
+//   });
+// });
 
 // Calculate total commission for a given sales associate
 app.get('/total-commission/:mobileNumber', (req, res) => {

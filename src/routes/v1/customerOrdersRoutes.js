@@ -12,7 +12,7 @@ import {
 
 const router = Router();
 
-router.post('/saveOrder', saveOrderController);
+// router.post('/saveOrder', saveOrderController);
 router.post('/placeOrder', placeOrderController);
 router.get('/getOrders', getOrdersController);
 router.get('/getCustomerOrder/:phoneNumber', getCustomerOrdersController);
