@@ -9,7 +9,7 @@ export const TblCommission = new EntitySchema({
       type: 'int',
       generated: true,
     },
-    mobileNumber: {
+    phoneNumber: {
       type: 'varchar',
       length: 15,
     },

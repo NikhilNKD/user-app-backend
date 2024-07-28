@@ -17,9 +17,10 @@ export const TblSalesExecutives = new EntitySchema({
       type: 'varchar',
       nullable: true,
     },
-    mobileNo: {
+    phoneNumber: {
       type: 'varchar',
       length: 15,
+      unique: true,
     },
     pincode: {
       type: 'varchar',

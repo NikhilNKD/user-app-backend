@@ -1,18 +1,18 @@
 // src/services/salesExecutiveService.js
 
-import { checkUserRepository,submitFormRepository,getShopkeeperRepo, getSalesExecutiveRepos, getCommissionRepo, getTblCommissionRepo  } from '../repositories/salesExecutiveRepository.js';
+import { checkUserRepository,submitFormRepository,getShopkeeperRepo, getSalesExecutiveRepos, getCommissionRepo, getTblCommissionRepo, updateShopkeeperProfileRepository, checkSalesAssociateRepository, getCommissionByLevelRepository, getUserLevelRepository  } from '../repositories/salesExecutiveRepository.js';
+import { AppDataSource } from '../config/data-source.js';
+import { uploadImage } from './s3Service.js';
 
-export const checkUserService = async (mobileNumber) => {
-  try {
-    return await checkUserRepository(mobileNumber);
-  } catch (error) {
-    throw new Error('Error in checkUserService: ' + error.message);
-  }
-};
+  export const checkUserService = async (mobileNumber) => {
+    try {
+      return await checkUserRepository(mobileNumber);
+    } catch (error) {
+      throw new Error('Error in checkUserService: ' + error.message);
+    }
+  };
 
-
-
-export const submitFormService = async (firstName, lastName, mobileNumber, pincode, commissionLevel) => {
+  export const submitFormService = async (firstName, lastName, mobileNumber, pincode, commissionLevel) => {
 	try {
 	  return await submitFormRepository(firstName, lastName, mobileNumber, pincode, commissionLevel);
 	} catch (error) {
@@ -20,61 +20,200 @@ export const submitFormService = async (firstName, lastName, mobileNumber, pinco
 	}
   };
 
-  export const registerSalesService = async (shopkeeperData) => {
+  export const getTotalCommissionService = async (mobileNumber, res) => {
     try {
+      const commissionRepo =await getTblCommissionRepo();
+      const data = await commissionRepo.findOne({ where: { phoneNumber: mobileNumber } })
+      if(!data) throw new Error('Not applicable for commision');
 
-      if(shopkeeperData && shopkeeperData.salesAssociateNumber){
-        const salesAssociateRepo = await getSalesExecutiveRepos()
-        const salesAssociate = await salesAssociateRepo.findOne({ where: { mobileNo: shopkeeperData.salesAssociateNumber } });
-        if(!salesAssociate) throw new Error('No such SalesAssociate');
-      }
-      const shopkeeperRepo = await getShopkeeperRepo()
-      const shopkeeper = shopkeeperRepo.create(shopkeeperData);
-      await shopkeeperRepo.save(shopkeeper);
-  
-      await checkAndAssignCommission(shopkeeperData.salesAssociateNumber);
+      const result = await commissionRepo.createQueryBuilder('commission')
+      .select('SUM(commission.amount)', 'totalAmount')
+      .where('commission.phoneNumber = :phoneNumber', { phoneNumber: mobileNumber })
+      .getRawOne();
+
+      const totalAmount = result.totalAmount;
+      return totalAmount;
     } catch (error) {
-      console.log("Error in registerSalesService", error.message)
-      throw new Error('Error in registerSalesService: ' + error.message);
+      throw new Error('Error in getTotalCommissionService: ' + error.message);
     }
   };
 
-  export const checkAndAssignCommission = async (salesAssociateNumber) => {
-    console.log('Checking and assigning commission for sales associate:', salesAssociateNumber);
+  export const updateShopkeeperProfileService = async (
+    phoneNumber,
+    shopkeeperName,
+    pincode,
+    shopState,
+    city,
+    address,
+    salesAssociateNumber,
+    selectedCategory
+  ) => {
+    try {
+      return await updateShopkeeperProfileRepository(
+        phoneNumber,
+        shopkeeperName,
+        pincode,
+        shopState,
+        city,
+        address,
+        salesAssociateNumber,
+        selectedCategory
+      );
+    } catch (error) {
+      throw new Error('Error in updateShopkeeperProfileService: ' + error.message);
+    }
+  };          
+
+  export const checkSalesAssociateService = async (number) => {
+    try {
+      return await checkSalesAssociateRepository(number);
+    } catch (error) {
+      throw new Error('Error in checkSalesAssociateService: ' + error.message);
+    }
+  };
+
+  export const getCommissionByLevelService = async (level) => {
+    try {
+      return await getCommissionByLevelRepository(level);
+    } catch (error) {
+      throw new Error('Error in getCommissionByLevelService: ' + error.message);
+    }
+  };
+
+  export const getUserLevelService = async (mobileNumber) => {
+    try {
+      return await getUserLevelRepository(mobileNumber);
+    } catch (error) {
+      throw new Error('Error in getUserLevelService: ' + error.message);
+    }
+  };
+
+  export const calculateTotalCommissionService = async (mobileNumber) => {
+    try {
+      const user = await getUserLevelAndAddedByRepository(mobileNumber);
+      
+      if (!user) {
+        return null;
+      }
+  
+      const { level, addedBy } = user;
+  
+      const individualCommission = await getCommissionAmountRepository(level);
+  
+      if (individualCommission === null) {
+        return null;
+      }
+  
+      const adjustment = await getCommissionAdjustmentRepository(addedBy, level);
+  
+      const shopCount = await getShopCountRepository(mobileNumber);
+  
+      let totalCommission = 0;
+      let totalL2Commission = 0;
+      let totalL1Commission = 0;
+  
+      if (level === 'L1') {
+        totalCommission = individualCommission * shopCount;
+      } else if (level === 'L2') {
+        totalCommission = (individualCommission + adjustment) * shopCount;
+      } else if (level === 'L3') {
+        const l3ToL2Adjustment = await getCommissionAdjustmentRepository('L3', 'L2');
+        const l2ToL1Adjustment = await getCommissionAdjustmentRepository('L2', 'L1');
+  
+        totalCommission = (individualCommission + adjustment) * shopCount;
+        totalL2Commission = l3ToL2Adjustment * shopCount;
+        totalL1Commission = l2ToL1Adjustment * shopCount;
+      }
+  
+      return {
+        totalCommission,
+        additionalCommissions: {
+          totalL2Commission,
+          totalL1Commission
+        }
+      };
+    } catch (error) {
+      throw new Error('Error in calculateTotalCommissionService: ' + error.message);
+    }
+  };
+  
+  export const registerSalesService = async (shopkeeperData) => {
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    try {
+        await queryRunner.startTransaction();
+        // console.log(shopkeeperData)
+        if (!shopkeeperData || !shopkeeperData.phoneNumber || !shopkeeperData.salesAssociateNumber) {
+            throw new Error("Required fields are missing");
+        }
+
+        const salesAssociateRepo = getSalesExecutiveRepos(queryRunner.manager);
+        const salesAssociate = await salesAssociateRepo.findOne({ where: { phoneNumber: shopkeeperData.salesAssociateNumber } });
+        if (!salesAssociate) {
+            throw new Error("Sales Associate number is not valid");
+        }
+
+        let key = null;
+        if(shopkeeperData.imageData.buffer){
+          key = shopkeeperData.imageData.name + Date.now();
+          const data = await uploadImageToS3(shopkeeperData.imageData,key);
+          if(!data || data.$metadata.httpStatusCode != 200) throw new Error("Error while uploading image to S3")
+        }
+        const shopkeeperRepo = getShopkeeperRepo(queryRunner.manager);
+        delete shopkeeperData.imageData;
+        const shopkeeper = shopkeeperRepo.create({
+          ...shopkeeperData,
+          profilePicture: key
+        });
+        await shopkeeperRepo.save(shopkeeper);
+        await checkAndAssignCommission(shopkeeperData.salesAssociateNumber, queryRunner.manager);
+
+        await queryRunner.commitTransaction();
+        return { status: 200, message: "Shopkeeper registered successfully" };
+    } catch (error) {
+        await queryRunner.rollbackTransaction();
+        console.error("Error in registerSalesService", error.message);
+        throw new Error('Error in registerSalesService: ' + error.message);
+    } finally {
+        await queryRunner.release();
+    }
+};
+
+export const checkAndAssignCommission = async (salesAssociateNumber, transactionalEntityManager) => {
+    // console.log('Checking and assigning commission for sales associate:', salesAssociateNumber);
 
     if (!salesAssociateNumber) {
-        console.log('No sales associate number provided, skipping commission assignment.');
-        return;
+      throw new Error("Sales Associate is missing");
     }
 
     try {
-        const salesAssociateRepo = await getSalesExecutiveRepos()
-        const salesAssociate = await salesAssociateRepo.findOne({ where: { mobileNo: salesAssociateNumber } });
+        const salesAssociateRepo = getSalesExecutiveRepos(transactionalEntityManager);
+        const salesAssociate = await salesAssociateRepo.findOne({ where: { phoneNumber: salesAssociateNumber } });
         if (!salesAssociate) {
-            console.warn(`Sales associate number ${salesAssociateNumber} is not valid, no commission assigned.`);
-            return { error: `Sales associate number ${salesAssociateNumber} is not valid, no commission assigned.` };
+          throw new Error("Sales Associate number is not valid");
         }
 
         let addedBy = salesAssociate.addedBy;
 
         // Fetch commission rates from the database
-        const commissionRates = await fetchCommissionRates();
+        const commissionRates = await fetchCommissionRates(transactionalEntityManager);
 
         // Assign commission to the sales associate
         const commissionAmountBase = commissionRates['Base'];
-        await assignCommission(salesAssociateNumber, 'Base', commissionAmountBase);
+        await assignCommission(salesAssociateNumber, 'Base', commissionAmountBase, transactionalEntityManager);
 
         // If the sales associate was added by someone, assign additional commission
         if (addedBy) {
             const commissionAmountL1 = commissionRates['L1'];
-            await assignCommission(addedBy, 'L1', commissionAmountL1);
+            await assignCommission(addedBy, 'L1', commissionAmountL1, transactionalEntityManager);
 
             // Check if the person who added the sales associate was also added by someone
-            const addedBySalesAssociate = await salesAssociateRepo.findOne({ where: { mobileNo: addedBy } });
+            const addedBySalesAssociate = await salesAssociateRepo.findOne({ where: { phoneNumber: addedBy } });
 
             if (addedBySalesAssociate && addedBySalesAssociate.addedBy) {
                 const commissionAmountL2 = commissionRates['L2'];
-                await assignCommission(addedBySalesAssociate.addedBy, 'L2', commissionAmountL2);
+                await assignCommission(addedBySalesAssociate.addedBy, 'L2', commissionAmountL2, transactionalEntityManager);
             } else {
                 console.warn(`No further addedBy found for ${addedBy}, skipping L2 commission assignment.`);
             }
@@ -85,52 +224,75 @@ export const submitFormService = async (firstName, lastName, mobileNumber, pinco
     }
 };
 
-const assignCommission = async (mobileNumber, commissionType, commissionAmount) => {
-    console.log('Assigning commission for:', mobileNumber, commissionType, commissionAmount);
+const assignCommission = async (phoneNumber, commissionType, commissionAmount, transactionalEntityManager) => {
+    // console.log('Assigning commission for:', phoneNumber, commissionType, commissionAmount);
 
-    if (!mobileNumber) {
+    if (!phoneNumber) {
         throw new Error('mobileNumber is null or undefined');
     }
 
     try {
-        const commissionRepo = await getTblCommissionRepo(); // Assume you have a Commission entity
-        const existingCommission = await commissionRepo.findOne({ where: { mobileNumber, commissionType } });
+        const commissionRepo = getTblCommissionRepo(transactionalEntityManager); // Assume you have a Commission entity
+        // const existingCommission = await commissionRepo.findOne({ where: { phoneNumber, commissionType } });
 
-        if (existingCommission) {
-            existingCommission.amount = parseFloat(commissionAmount).toFixed(2);
-            await commissionRepo.save(existingCommission);
-        } else {
+        // if (existingCommission) {
+        //     existingCommission.amount = parseFloat(commissionAmount).toFixed(2);
+        //     await commissionRepo.save(existingCommission);
+        // } else {
             const newCommission = commissionRepo.create({
-                mobileNumber,
+                phoneNumber,
                 commissionType,
                 amount: parseFloat(commissionAmount).toFixed(2),
             });
             await commissionRepo.save(newCommission);
-        }
+        // }
     } catch (error) {
         console.error('Error assigning commission:', error);
         throw new Error('Error assigning commission');
     }
 };
-  
-//function to fetch commissionRates form the comission_rates table
-export const fetchCommissionRates = async () => {
-  try {
-    // Get repository for the Commission entity
-    const commissionRepo = await getCommissionRepo();
-    
-    // Fetch all records from the commission_rates table
-    const commissions = await commissionRepo.find();
-    // Transform the result into an object with level as keys
-    const commissionRates = commissions.reduce((acc, cur) => {
-      acc[cur.level] = cur.commission_amount;
-      return acc;
-    
-    }, {});
 
-    return commissionRates;
-  } catch (error) {
-    console.error('Error fetching commission rates:', error);
-    throw new Error('Error fetching commission rates');
-  }
+// Function to fetch commission rates from the commission_rates table
+export const fetchCommissionRates = async (transactionalEntityManager) => {
+    try {
+        // Get repository for the Commission entity
+        const commissionRepo = getCommissionRepo(transactionalEntityManager);
+
+        // Fetch all records from the commission_rates table
+        const commissions = await commissionRepo.find();
+
+        // Transform the result into an object with level as keys
+        const commissionRates = commissions.reduce((acc, cur) => {
+            acc[cur.level] = cur.commission_amount;
+            return acc;
+        }, {});
+
+        return commissionRates;
+    } catch (error) {
+        console.error('Error fetching commission rates:', error);
+        throw new Error('Error fetching commission rates');
+    }
 };
+
+export const uploadImageToS3 = async(imageData,key) =>{
+  // let key;
+    if (imageData.buffer) {
+      key = key;
+      try {
+        uploadImage(imageData, key)
+          .then(data => {
+            return data;
+              // res.status(200).send({
+              //     message: 'Image uploaded successfully',
+              //     data: data
+              // });
+          })
+          .catch(err => {
+              throw new Error ("Error while uploading image to S3")
+          });
+        
+      } catch (error) {
+        throw new Error (error.message)
+      }
+    }
+}

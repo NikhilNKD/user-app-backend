@@ -74,9 +74,10 @@ export const validateOtp = async (phoneNumber, otp) => {
       return 'Invalid or expired OTP';
     }
 
-    await removeOtp(savedOtp);
+    // await removeOtp(savedOtp);
 
     let user = await findUserByPhoneNumber(phoneNumber);
+    console.log(user, "---")
     let message;
     if (!user) {
       user = await saveUser({ phoneNumber });
