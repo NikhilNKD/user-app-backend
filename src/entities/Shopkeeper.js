@@ -12,9 +12,11 @@ export const Shopkeeper = new EntitySchema({
     phoneNumber: {
       type: 'varchar',
       length: 15,
+      unique: true,
     },
     shopkeeperName: {
       type: 'varchar',
+      nullable: true,
     },
     pincode: {
       type: 'varchar',
@@ -56,6 +58,7 @@ export const Shopkeeper = new EntitySchema({
     shopID: {
       type: 'varchar',
       nullable: true,
+      unique: true,
     },
     shopType: {
       type: 'varchar',

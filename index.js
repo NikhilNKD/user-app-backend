@@ -41,6 +41,7 @@ const storage = multer.diskStorage({
   },
 });
 
+
 const upload = multer({ storage: storage });
  
 app.use(bodyParser.json());  // To parse JSON bodies
@@ -942,124 +943,124 @@ async function checkAndAssignCommission(salesAssociateNumber) {
 }
 
 //register sales executive
-app.post('/submit-form', (req, res) => {
-  const { firstName, lastName, mobileNumber, pincode } = req.body;
-  const commissionLevel = 'L0'; 
-  const sql = 'INSERT INTO tbl_salesexecutives (firstName, lastName, mobileNo, pincode, level) VALUES (?, ?, ?, ?, ?)';
-  db.query(sql, [firstName, lastName, mobileNumber, pincode, commissionLevel], (err, result) => {
-    if (err) {
-      console.error('Error saving data to database:', err);
-      res.status(500).json({ error: 'Internal server error' });
-      return;
-    }
-    console.log('Data saved to database');
-    res.json({ success: true });
-  });
-});
+// app.post('/submit-form', (req, res) => {
+//   const { firstName, lastName, mobileNumber, pincode } = req.body;
+//   const commissionLevel = 'L0'; 
+//   const sql = 'INSERT INTO tbl_salesexecutives (firstName, lastName, mobileNo, pincode, level) VALUES (?, ?, ?, ?, ?)';
+//   db.query(sql, [firstName, lastName, mobileNumber, pincode, commissionLevel], (err, result) => {
+//     if (err) {
+//       console.error('Error saving data to database:', err);
+//       res.status(500).json({ error: 'Internal server error' });
+//       return;
+//     }
+//     console.log('Data saved to database');
+//     res.json({ success: true });
+//   });
+// });
 
 
 //team member add
-app.post('/submit-team-member', (req, res) => {
-  const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy } = req.body;
+// app.post('/submit-team-member', (req, res) => {
+//   const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy } = req.body;
   
-  // New team members should be assigned level L0 by default
-  const level = 'L0';
+//   // New team members should be assigned level L0 by default
+//   const level = 'L0';
 
-  const insertSql = 'INSERT INTO tbl_salesexecutives (mobileNo, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-  db.query(insertSql, [mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level], (err, result) => {
-      if (err) {
-          console.error('Error saving data to database:', err);
-          res.status(500).json({ error: 'Internal server error' });
-          return;
-      }
-      console.log('Team member added successfully');
-      res.json({ success: true });
-  });
-})
+//   const insertSql = 'INSERT INTO tbl_salesexecutives (mobileNo, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+//   db.query(insertSql, [mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level], (err, result) => {
+//       if (err) {
+//           console.error('Error saving data to database:', err);
+//           res.status(500).json({ error: 'Internal server error' });
+//           return;
+//       }
+//       console.log('Team member added successfully');
+//       res.json({ success: true });
+//   });
+// })
 
 //info about team member
-app.get('/my-team/:mobileNumber', (req, res) => {
-  const { mobileNumber } = req.params;
-  const sql = 'SELECT * FROM tbl_salesexecutives WHERE addedBy = ?';
-  db.query(sql, [mobileNumber], (err, result) => {
-    if (err) {
-      console.error('Error fetching data from database:', err);
-      res.status(500).json({ error: 'Internal server error' });
-      return;
-    }
-    console.log('Data fetched successfully');
-    res.json(result);
-  });
-});
+// app.get('/my-team/:mobileNumber', (req, res) => {
+//   const { mobileNumber } = req.params;
+//   const sql = 'SELECT * FROM tbl_salesexecutives WHERE addedBy = ?';
+//   db.query(sql, [mobileNumber], (err, result) => {
+//     if (err) {
+//       console.error('Error fetching data from database:', err);
+//       res.status(500).json({ error: 'Internal server error' });
+//       return;
+//     }
+//     console.log('Data fetched successfully');
+//     res.json(result);
+//   });
+// });
 
 //profile
-app.get('/my-profile/:mobileNumber', (req, res) => {
-  const mobileNumber = req.params.mobileNumber;
-  const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
-  db.query(sql, [mobileNumber], (err, result) => {
-    if (err) {
-      console.error('Error fetching profile:', err);
-      res.status(500).send('Error fetching profile');
-      return;
-    }
-    if (result.length === 0) {
-      res.status(404).send('Profile not found');
-      return;
-    }
-    res.status(200).json(result[0]);
-  });
-});
+// app.get('/my-profile/:mobileNumber', (req, res) => {
+//   const mobileNumber = req.params.mobileNumber;
+//   const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
+//   db.query(sql, [mobileNumber], (err, result) => {
+//     if (err) {
+//       console.error('Error fetching profile:', err);
+//       res.status(500).send('Error fetching profile');
+//       return;
+//     }
+//     if (result.length === 0) {
+//       res.status(404).send('Profile not found');
+//       return;
+//     }
+//     res.status(200).json(result[0]);
+//   });
+// });
 
 // Route to update user's profile
-app.post('/update-profile', (req, res) => {
-  const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard } = req.body;
-  const sql = 'UPDATE tbl_salesexecutives SET firstName = ?, lastName = ?, pincode = ?, aadhar = ?, upi = ?, pancard = ? WHERE mobileNo = ?';
-  db.query(sql, [firstName, lastName, pincode, aadhar, upi, pancard, mobileNumber], (err, result) => {
-    if (err) {
-      console.error('Error updating profile:', err);
-      res.status(500).send('Error updating profile');
-      return;
-    }
-    console.log('Profile updated successfully');
-    res.status(200).send('Profile updated successfully');
-  });
-});
+// app.post('/update-profile', (req, res) => {
+//   const { mobileNumber, firstName, lastName, pincode, aadhar, upi, pancard } = req.body;
+//   const sql = 'UPDATE tbl_salesexecutives SET firstName = ?, lastName = ?, pincode = ?, aadhar = ?, upi = ?, pancard = ? WHERE mobileNo = ?';
+//   db.query(sql, [firstName, lastName, pincode, aadhar, upi, pancard, mobileNumber], (err, result) => {
+//     if (err) {
+//       console.error('Error updating profile:', err);
+//       res.status(500).send('Error updating profile');
+//       return;
+//     }
+//     console.log('Profile updated successfully');
+//     res.status(200).send('Profile updated successfully');
+//   });
+// });
 
 
-app.get('/shops', (req, res) => {
-  const { salesAssociateNumber } = req.query;
-  const query = `
-      SELECT * 
-      FROM shopkeeper 
-      WHERE salesAssociateNumber = ?;
-  `;
-  db.query(query, [salesAssociateNumber], (error, results) => {
-      if (error) {
-          console.error('Error fetching shops:', error);
-          res.status(500).json({ error: 'Internal Server Error' });
-          return;
-      }
-      res.json(results);
-  });
-});
+// app.get('/shops', (req, res) => {
+//   const { salesAssociateNumber } = req.query;
+//   const query = `
+//       SELECT * 
+//       FROM shopkeeper 
+//       WHERE salesAssociateNumber = ?;
+//   `;
+//   db.query(query, [salesAssociateNumber], (error, results) => {
+//       if (error) {
+//           console.error('Error fetching shops:', error);
+//           res.status(500).json({ error: 'Internal Server Error' });
+//           return;
+//       }
+//       res.json(results);
+//   });
+// });
 
-app.post('/check-user', (req, res) => {
-  const { mobileNumber } = req.body;
-  const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
-  db.query(sql, [mobileNumber], (err, results) => {
-    if (err) {
-      console.error('Error checking user:', err);
-      res.status(500).json({ error: 'Internal server error' });
-      return;
-    }
+// app.post('/check-user', (req, res) => {
+//   const { mobileNumber } = req.body;
+//   const sql = 'SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?';
+//   db.query(sql, [mobileNumber], (err, results) => {
+//     if (err) {
+//       console.error('Error checking user:', err);
+//       res.status(500).json({ error: 'Internal server error' });
+//       return;
+//     }
 
-    if (results.length > 0) {
-      res.json({ exists: true });
-    } else {
-      res.json({ exists: false });
-    }
-  });
-});
+//     if (results.length > 0) {
+//       res.json({ exists: true });
+//     } else {
+//       res.json({ exists: false });
+//     }
+//   });
+// });
 
 // Calculate total commission for a given sales associate
 app.get('/total-commission/:mobileNumber', (req, res) => {
@@ -1169,188 +1170,188 @@ app.get('/total-commission/:mobileNumber', (req, res) => {
 });
 
 
-app.get('/user-level/:mobileNumber', (req, res) => {
-  const { mobileNumber } = req.params;
-  const sql = 'SELECT level FROM nkd.tbl_salesexecutives WHERE mobileNo = ?';
-  db.query(sql, [mobileNumber], (err, result) => {
-      if (err) {
-          console.error('Error fetching user level:', err);
-          res.status(500).json({ error: 'Internal server error' });
-          return;
-      }
-      if (result.length === 0) {
-          res.status(404).json({ error: 'User not found' });
-          return;
-      }
-      res.json({ level: result[0].level });
-  });
-});
+// app.get('/user-level/:mobileNumber', (req, res) => {
+//   const { mobileNumber } = req.params;
+//   const sql = 'SELECT level FROM nkd.tbl_salesexecutives WHERE mobileNo = ?';
+//   db.query(sql, [mobileNumber], (err, result) => {
+//       if (err) {
+//           console.error('Error fetching user level:', err);
+//           res.status(500).json({ error: 'Internal server error' });
+//           return;
+//       }
+//       if (result.length === 0) {
+//           res.status(404).json({ error: 'User not found' });
+//           return;
+//       }
+//       res.json({ level: result[0].level });
+//   });
+// });
 
 
-app.get('/commission/:level', (req, res) => {
-const level = req.params.level;
+// app.get('/commission/:level', (req, res) => {
+// const level = req.params.level;
 
-const sql = 'SELECT commission_amount FROM nkd.commission WHERE level = ?';
-db.query(sql, [level], (err, result) => {
-  if (err) {
-    console.error('Error fetching commission:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-    return;
-  }
+// const sql = 'SELECT commission_amount FROM nkd.commission WHERE level = ?';
+// db.query(sql, [level], (err, result) => {
+//   if (err) {
+//     console.error('Error fetching commission:', err);
+//     res.status(500).json({ success: false, error: 'Internal server error' });
+//     return;
+//   }
 
-  if (result.length === 0) {
-    res.status(404).json({ success: false, error: 'Commission data not found' });
-  } else {
-    const commission = result[0].commission_amount;
-    res.json({ success: true, commission });
-  }
-});
-});
-
-
+//   if (result.length === 0) {
+//     res.status(404).json({ success: false, error: 'Commission data not found' });
+//   } else {
+//     const commission = result[0].commission_amount;
+//     res.json({ success: true, commission });
+//   }
+// });
+// });
 
 
 
-// Example route for checking sales associate number
-app.get('/checkSalesAssociate/:number', (req, res) => {
-  const { number } = req.params;
 
-  // Check if the mobile number exists in the tbl_salesexecutives table
-  db.query('SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?', [number], (err, results) => {
-      if (err) {
-          console.error('Error checking sales associate existence:', err);
-          return res.status(500).json({ message: 'Internal server error' });
-      }
 
-      if (results.length > 0) {
-          // Mobile number exists in the tbl_salesexecutives database
-          return res.status(200).json({ exists: true });
-      } else {
-          // Mobile number doesn't exist in the tbl_salesexecutives database
-          return res.status(200).json({ exists: false });
-      }
-  });
-});
+// // Example route for checking sales associate number
+// app.get('/checkSalesAssociate/:number', (req, res) => {
+//   const { number } = req.params;
+
+//   // Check if the mobile number exists in the tbl_salesexecutives table
+//   db.query('SELECT * FROM tbl_salesexecutives WHERE mobileNo = ?', [number], (err, results) => {
+//       if (err) {
+//           console.error('Error checking sales associate existence:', err);
+//           return res.status(500).json({ message: 'Internal server error' });
+//       }
+
+//       if (results.length > 0) {
+//           // Mobile number exists in the tbl_salesexecutives database
+//           return res.status(200).json({ exists: true });
+//       } else {
+//           // Mobile number doesn't exist in the tbl_salesexecutives database
+//           return res.status(200).json({ exists: false });
+//       }
+//   });
+// });
 
 //2587413690
 
-app.put('/updateProfile/:phoneNumber', (req, res) => {
-  const { phoneNumber } = req.params;
-  const {
-      shopkeeperName,
-      pincode,
-      shopState,
-      city,
-      address,
-      salesAssociateNumber,
-      selectedCategory
-  } = req.body;s
+// app.put('/updateProfile/:phoneNumber', (req, res) => {
+//   const { phoneNumber } = req.params;
+//   const {
+//       shopkeeperName,
+//       pincode,
+//       shopState,
+//       city,
+//       address,
+//       salesAssociateNumber,
+//       selectedCategory
+//   } = req.body;
 
-  const query = `
-      UPDATE nkd.shopkeepers
-      SET 
-          shopkeeperName = ?,
-          pincode = ?,
-          shopState = ?,
-          city = ?,
-          address = ?,
-          salesAssociateNumber = ?,
-          selectedCategory = ?
-      WHERE phoneNumber = ?
-  `;
+//   const query = `
+//       UPDATE nkd.shopkeepers
+//       SET 
+//           shopkeeperName = ?,
+//           pincode = ?,
+//           shopState = ?,
+//           city = ?,
+//           address = ?,
+//           salesAssociateNumber = ?,
+//           selectedCategory = ?
+//       WHERE phoneNumber = ?
+//   `;
 
-  db.query(
-      query,
-      [
-          shopkeeperName,
-          pincode,
-          shopState,
-          city,
-          address,
-          salesAssociateNumber,
-          selectedCategory,
-          phoneNumber
-      ],
-      (error, results) => {
-          if (error) {
-              console.error('Error executing query:', error);
-              return res.status(500).json({ error: 'Database query error' });
-          }
-          res.json({ message: 'Shopkeeper profile updated successfully' });
-      }
-  );
-});
+//   db.query(
+//       query,
+//       [
+//           shopkeeperName,
+//           pincode,
+//           shopState,
+//           city,
+//           address,
+//           salesAssociateNumber,
+//           selectedCategory,
+//           phoneNumber
+//       ],
+//       (error, results) => {
+//           if (error) {
+//               console.error('Error executing query:', error);
+//               return res.status(500).json({ error: 'Database query error' });
+//           }
+//           res.json({ message: 'Shopkeeper profile updated successfully' });
+//       }
+//   );
+// });
 // Endpoint to retrieve total commission for a specific mobile number
-app.get('/myTotalCommission', async (req, res) => {
-  const { mobileNumber } = req.query;
+// app.get('/myTotalCommission', async (req, res) => {
+//   const { mobileNumber } = req.query;
 
-  try {
-      // Retrieve total commission for the specified mobile number
-      const totalCommission = await new Promise((resolve, reject) => {
-          db.query(
-              'SELECT SUM(amount) AS totalCommission FROM tbl_commission WHERE mobileNumber = ?',
-              [mobileNumber],
-              (err, result) => {
-                  if (err) {
-                      console.error('Error fetching total commission:', err);
-                      reject(err);
-                      return;
-                  }
-                  resolve(result[0].totalCommission || 0);
-              }
-          );
-      });
+//   try {
+//       // Retrieve total commission for the specified mobile number
+//       const totalCommission = await new Promise((resolve, reject) => {
+//           db.query(
+//               'SELECT SUM(amount) AS totalCommission FROM tbl_commission WHERE mobileNumber = ?',
+//               [mobileNumber],
+//               (err, result) => {
+//                   if (err) {
+//                       console.error('Error fetching total commission:', err);
+//                       reject(err);
+//                       return;
+//                   }
+//                   resolve(result[0].totalCommission || 0);
+//               }
+//           );
+//       });
 
-      res.status(200).json({ totalCommission });
-  } catch (error) {
-      console.error('Error retrieving total commission:', error);
-      res.status(500).json({ message: 'Internal server error' });
-  }
-});
+//       res.status(200).json({ totalCommission });
+//   } catch (error) {
+//       console.error('Error retrieving total commission:', error);
+//       res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
 
 
 
 //Register Shopkeeper from sales executive module 
-app.post('/registerSales', upload.none(), async (req, res) => {
-  const {
-      phoneNumber,
-      shopkeeperName,
-      shopID,
-      pincode,
-      shopState,
-      city,
-      address,
-      salesAssociateNumber,
-      selectedCategory,
-      selectedSubCategory,
-  } = req.body;
+// app.post('/registerSales', upload.none(), async (req, res) => {
+//   const {
+//       phoneNumber,
+//       shopkeeperName,
+//       shopID,
+//       pincode,
+//       shopState,
+//       city,
+//       address,
+//       salesAssociateNumber,
+//       selectedCategory,
+//       selectedSubCategory,
+//   } = req.body;
 
-  try {
-      // Insert new shopkeeper into the database
-      await new Promise((resolve, reject) => {
-          db.query(
-              'INSERT INTO shopkeepers (phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-              [phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory],
-              (err, result) => {
-                  if (err) {
-                      console.error('Error registering shopkeeper:', err);
-                      reject(err);
-                      return;
-                  }
-                  resolve(result);
-              }
-          );
-      });
+//   try {
+//       // Insert new shopkeeper into the database
+//       await new Promise((resolve, reject) => {
+//           db.query(
+//               'INSERT INTO shopkeepers (phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+//               [phoneNumber, shopkeeperName, shopID, pincode, shopState, city, address, salesAssociateNumber, selectedCategory, selectedSubCategory],
+//               (err, result) => {
+//                   if (err) {
+//                       console.error('Error registering shopkeeper:', err);
+//                       reject(err);
+//                       return;
+//                   }
+//                   resolve(result);
+//               }
+//           );
+//       });
 
-      // Check if the sales associate was added by someone and assign commission
-      await checkAndAssignCommission(salesAssociateNumber);
+//       // Check if the sales associate was added by someone and assign commission
+//       await checkAndAssignCommission(salesAssociateNumber);
 
-      res.status(200).json({ message: 'Shopkeeper registered successfully' });
-  } catch (error) {
-      console.error('Error registering shopkeeper:', error);
-      res.status(500).json({ message: 'Internal server error' });
-  }
-});
+//       res.status(200).json({ message: 'Shopkeeper registered successfully' });
+//   } catch (error) {
+//       console.error('Error registering shopkeeper:', error);
+//       res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
 
 
 
