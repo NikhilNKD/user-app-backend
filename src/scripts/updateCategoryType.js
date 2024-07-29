@@ -42,12 +42,7 @@
 //updateCategoryTypes();
 
 
-// src/scripts/insertMainServices.js
-
-// src/scripts/insertMainServices.js
-// scripts/insertMainServices.js
-
-// scripts/updateMainServices.js
+ 
 
 //import dotenv from 'dotenv';
 //import { AppDataSource } from '../config/data-source.js';
@@ -171,59 +166,59 @@
 
 //checkSubcategories();
 
-import dotenv from 'dotenv';
-import { AppDataSource } from '../config/data-source.js';
-import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
+//import dotenv from 'dotenv';
+//import { AppDataSource } from '../config/data-source.js';
+//import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
 
-dotenv.config();
+//dotenv.config();
 
-const keepSubcategories = [
-  { id: 1, name: 'Men', categoryId: 5 },
-  { id: 2, name: 'Women', categoryId: 5 },
-  { id: 3, name: 'Unisex', categoryId: 5 },
-];
+//const keepSubcategories = [
+//  { id: 1, name: 'Men', categoryId: 5 },
+//  { id: 2, name: 'Women', categoryId: 5 },
+//  { id: 3, name: 'Unisex', categoryId: 5 },
+//];
 
-const updateSubcategories = async () => {
-  try {
-    console.log('Initializing the database connection...');
-    await AppDataSource.initialize();
-    console.log('Database connected successfully');
+//const updateSubcategories = async () => {
+//  try {
+//    console.log('Initializing the database connection...');
+//    await AppDataSource.initialize();
+//    console.log('Database connected successfully');
 
-    const subcategoryRepository = AppDataSource.getRepository(TblSalonSubcategory);
+//    const subcategoryRepository = AppDataSource.getRepository(TblSalonSubcategory);
 
-    // Fetch all subcategories
-    const existingSubcategories = await subcategoryRepository.find();
+//    // Fetch all subcategories
+//    const existingSubcategories = await subcategoryRepository.find();
 
-    // Get IDs of subcategories to keep
-    const idsToKeep = keepSubcategories.map(sub => sub.id);
+//    // Get IDs of subcategories to keep
+//    const idsToKeep = keepSubcategories.map(sub => sub.id);
 
-    // Find subcategories to delete (those not in the keep list)
-    const subcategoriesToDelete = existingSubcategories.filter(sub => !idsToKeep.includes(sub.id));
+//    // Find subcategories to delete (those not in the keep list)
+//    const subcategoriesToDelete = existingSubcategories.filter(sub => !idsToKeep.includes(sub.id));
 
-    // Delete the subcategories that are not in the keep list
-    if (subcategoriesToDelete.length > 0) {
-      await subcategoryRepository.remove(subcategoriesToDelete);
-      console.log('Removed subcategories:', subcategoriesToDelete.map(sub => sub.id));
-    } else {
-      console.log('No subcategories to remove.');
-    }
+//    // Delete the subcategories that are not in the keep list
+//    if (subcategoriesToDelete.length > 0) {
+//      await subcategoryRepository.remove(subcategoriesToDelete);
+//      console.log('Removed subcategories:', subcategoriesToDelete.map(sub => sub.id));
+//    } else {
+//      console.log('No subcategories to remove.');
+//    }
 
-    // Optionally, insert or update the subcategories to ensure they exist
-    for (const subcategory of keepSubcategories) {
-      await subcategoryRepository.upsert(subcategory, ['id']);
-    }
+//    // Optionally, insert or update the subcategories to ensure they exist
+//    for (const subcategory of keepSubcategories) {
+//      await subcategoryRepository.upsert(subcategory, ['id']);
+//    }
 
-    console.log('Subcategories updated successfully');
+//    console.log('Subcategories updated successfully');
 
-  } catch (error) {
-    console.error('Error updating subcategories:', error.message);
-  } finally {
-    console.log('Closing the database connection...');
-    await AppDataSource.destroy();
-  }
-};
+//  } catch (error) {
+//    console.error('Error updating subcategories:', error.message);
+//  } finally {
+//    console.log('Closing the database connection...');
+//    await AppDataSource.destroy();
+//  }
+//};
 
-updateSubcategories();
+//updateSubcategories();
 
 
 //import { AppDataSource } from '../config/data-source.js';
@@ -493,3 +488,34 @@ updateSubcategories();
 //};
 
 //insertCategories();
+
+
+import { AppDataSource } from '../config/data-source.js'; // Adjust the path if needed
+
+const removePhoneNumberData = async () => {
+  let queryRunner;
+
+  try {
+    console.log('Initializing the database connection...');
+    await AppDataSource.initialize();
+    console.log('Database connected successfully');
+
+    queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    // Execute the query to delete data
+    await queryRunner.query(`DELETE FROM shopkeepers WHERE phoneNumber = '9058206605'`);
+    console.log('Data with phoneNumber 9058206605 removed successfully');
+
+  } catch (error) {
+    console.error('Error removing data:', error.message);
+  } finally {
+    if (queryRunner) {
+      await queryRunner.release();
+    }
+    console.log('Closing the database connection...');
+    await AppDataSource.destroy();
+  }
+};
+
+removePhoneNumberData();

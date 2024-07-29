@@ -15,6 +15,7 @@ export const Shopkeeper = new EntitySchema({
     },
     shopkeeperName: {
       type: 'varchar',
+       nullable: true,
     },
     pincode: {
       type: 'varchar',
