@@ -39,6 +39,7 @@ export const TblOrders = new EntitySchema({
     },
     shopkeeperName: {
       type: 'varchar',
+      nullable: true
     },
     shopkeeperPhoneNumber: {
       type: 'varchar',
