@@ -38,7 +38,12 @@ export const registerCustomerController = async (req, res) => {
     try {
         const { phoneNumber, name, pincode, state, city, address, shopID } = req.body;
         const result = await registerCustomerService(phoneNumber, name, pincode, state, city, address, shopID);
-        res.json(result);
+        if (result.status === 'error') {
+            return res.status(400).json(result);
+        }
+        res.status(201).json(result); // 201 Created
+        
+         
     } catch (error) {
         console.error('Error in registerCustomerController:', error);
         res.status(500).json({ success: false, message: 'Internal server error', error: error.message });

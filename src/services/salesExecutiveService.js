@@ -3,22 +3,21 @@
 import { checkUserRepository,submitFormRepository,getShopkeeperRepo, getSalesExecutiveRepos, getCommissionRepo, getTblCommissionRepo, updateShopkeeperProfileRepository, checkSalesAssociateRepository, getCommissionByLevelRepository, getUserLevelRepository, getUserLevelAndAddedByRepository, getCommissionAmountRepository, getCommissionAdjustmentRepository, submitTeamMemberRepository, getMyTeamRepository, getProfileRepository, updateProfileRepository, getShopsRepository  } from '../repositories/salesExecutiveRepository.js';
 import { AppDataSource } from '../config/data-source.js';
 import { uploadImage } from './s3Service.js';
+export const checkUserService = async (phoneNumber) => {
+  try {
+    return await checkUserRepository(phoneNumber);
+  } catch (error) {
+    throw new Error('Error in checkUserService: ' + error.message);
+  }
+};
 
-  export const checkUserService = async (mobileNumber) => {
-    try {
-      return await checkUserRepository(mobileNumber);
-    } catch (error) {
-      throw new Error('Error in checkUserService: ' + error.message);
-    }
-  };
-
-  export const submitFormService = async (firstName, lastName, mobileNumber, pincode, commissionLevel) => {
-	try {
-	  return await submitFormRepository(firstName, lastName, mobileNumber, pincode, commissionLevel);
-	} catch (error) {
-	  throw new Error('Error in submitFormService: ' + error.message);
-	}
-  };
+export const submitFormService = async (firstName, lastName, phoneNumber, pincode, commissionLevel) => {
+  try {
+    return await submitFormRepository(firstName, lastName, phoneNumber, pincode, commissionLevel);
+  } catch (error) {
+    throw new Error('Error in submitFormService: ' + error.message);
+  }
+};
 
   export const submitTeamMemberService = async (teamMemberData) => {
     try {
@@ -43,14 +42,15 @@ import { uploadImage } from './s3Service.js';
 
   export const getMyTeamService = async (phoneNumber) => {
     try {
-      const checkUser = await checkUserRepository(phoneNumber); 
-      if (!checkUser) return {error: "user not exists"}
-      const team =  await getMyTeamRepository(phoneNumber);
-      return {message: team}
+        const checkUser = await checkUserRepository(phoneNumber); 
+        if (!checkUser) return { error: "User does not exist" };
+
+        const team = await getMyTeamRepository(phoneNumber);
+        return { message: team };
     } catch (error) {
-      throw new Error('Error in getMyTeamService: ' + error.message);
+        throw new Error('Error in getMyTeamService: ' + error.message);
     }
-  };
+};
 
   export const getProfileService = async (phoneNumber) => {
     try {
@@ -85,24 +85,24 @@ import { uploadImage } from './s3Service.js';
       throw new Error('Error in getShopsService: ' + error.message);
     }
   };
-
-  export const getTotalCommissionService = async (mobileNumber, res) => {
+  export const getTotalCommissionService = async (phoneNumber, res) => {
     try {
-      const commissionRepo =await getTblCommissionRepo();
-      const data = await commissionRepo.findOne({ where: { phoneNumber: mobileNumber } })
-      if(!data) throw new Error('Not applicable for commision');
-
+      const commissionRepo = await getTblCommissionRepo();
+      const data = await commissionRepo.findOne({ where: { phoneNumber } });
+      if (!data) throw new Error('Not applicable for commission');
+  
       const result = await commissionRepo.createQueryBuilder('commission')
-      .select('SUM(commission.amount)', 'totalAmount')
-      .where('commission.phoneNumber = :phoneNumber', { phoneNumber: mobileNumber })
-      .getRawOne();
-
+        .select('SUM(commission.amount)', 'totalAmount')
+        .where('commission.phoneNumber = :phoneNumber', { phoneNumber })
+        .getRawOne();
+  
       const totalAmount = result.totalAmount;
       return totalAmount;
     } catch (error) {
       throw new Error('Error in getTotalCommissionService: ' + error.message);
     }
   };
+  
 
   export const updateShopkeeperProfileService = async (
     phoneNumber,

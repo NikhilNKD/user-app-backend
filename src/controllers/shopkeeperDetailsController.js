@@ -42,9 +42,12 @@ export const getShopkeeperDetailsByShopIDController = async (req, res) => {
 export const getShopkeeperServiceDetailsController = async (req, res) => {
     try {
         const { phoneNumber } = req.params;
+        console.log(`Received phoneNumber: ${phoneNumber}`);  // Debugging statement
         const result = await getShopkeeperServiceDetailsByPhoneNumberService(phoneNumber);
+        console.log('Service Result:', result);  // Debugging statement
         res.status(result.status).json(result);
     } catch (error) {
+        console.error('Controller Error:', error);  // Debugging statement
         res.status(500).json({
             success: false,
             data: null,
@@ -53,7 +56,6 @@ export const getShopkeeperServiceDetailsController = async (req, res) => {
         });
     }
 };
-
 // Get shopkeeper product home details
 export const getShopkeeperProductHomeDetailsController = async (req, res) => {
     try {

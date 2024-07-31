@@ -17,10 +17,7 @@ export const getShopkeeperDetailsByShopID = async (shopID) => {
 // Get shopkeeper service details by phone number
 export const getShopkeeperServiceDetailsByPhoneNumber = async (phoneNumber) => {
     const shopkeeperRepo = AppDataSource.getRepository(Shopkeeper);
-    return await shopkeeperRepo.findOne({
-        where: { phoneNumber },
-        select: ['shopID', 'shopkeeperName', 'selectedSubCategory'],
-    });
+    return await shopkeeperRepo.findOneBy({ phoneNumber });
 };
 
 export const getShopkeeperProductHomeDetailsByPhoneNumber = async (phoneNumber) => {

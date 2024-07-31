@@ -2,14 +2,14 @@ import { calculateTotalCommissionService, checkSalesAssociateService, checkUserS
 import { submitFormService , registerSalesService} from '../services/salesExecutiveService.js';
 import { uploadImage } from '../services/s3Service.js';
 export const checkUserController = async (req, res) => {
-  const { mobileNumber } = req.body;
+  const { phoneNumber } = req.body;
 
   try {
-    if (!mobileNumber) {
-      return res.status(400).json({ success: false, message: 'Mobile number is required' });
+    if (!phoneNumber) {
+      return res.status(400).json({ success: false, message: 'Phone number is required' });
     }
 
-    const userExists = await checkUserService(mobileNumber);
+    const userExists = await checkUserService(phoneNumber);
     res.json({ exists: userExists });
   } catch (error) {
     console.error('Error in checkUserController:', error);
@@ -18,23 +18,23 @@ export const checkUserController = async (req, res) => {
 };
 
 
-
 export const submitFormController = async (req, res) => {
-	const { firstName, lastName, mobileNumber, pincode } = req.body;
-	const commissionLevel = 'L0';
-  
-	try {
-	  if (!firstName || !lastName || !mobileNumber || !pincode) {
-		return res.status(400).json({ success: false, message: 'All fields are required' });
-	  }
-  
-	  const result = await submitFormService(firstName, lastName, mobileNumber, pincode, commissionLevel);
-	  res.json({ success: result });
-	} catch (error) {
-	  console.error('Error in submitFormController:', error);
-	  res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
-	}
-  };
+  const { firstName, lastName, phoneNumber, pincode } = req.body;
+  const commissionLevel = 'L0';
+
+  try {
+    if (!firstName || !lastName || !phoneNumber || !pincode) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+
+    const result = await submitFormService(firstName, lastName, phoneNumber, pincode, commissionLevel);
+    res.json({ success: result });
+  } catch (error) {
+    console.error('Error in submitFormController:', error);
+    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+  }
+};
+
 
   export const submitTeamMemberController = async (req, res) => {
     const { phoneNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy } = req.body;
@@ -66,26 +66,22 @@ export const submitFormController = async (req, res) => {
   export const getMyTeamController = async (req, res) => {
     const { phoneNumber } = req.params;
     try {
-      const teamMembers = await getMyTeamService(phoneNumber);
+        const teamMembers = await getMyTeamService(phoneNumber);
 
-      if (teamMembers && teamMembers.message.length > 0 && teamMembers?.message) {
-        res.json({ success: true, message: result.message });
-      } 
-      else if (teamMembers && teamMembers.message.length === 0) {
-        return res.status(404).json({ success: false, message: [] });
-      } 
-      else if (teamMembers?.error){
-        return res.status(400).json({ success: false, error: result.error });
-      } else {
-        res.status(400).json({success: false, error: 'Failed to check team member' });
-      }
-      // res.json(teamMembers);
+        if (teamMembers && teamMembers.message && teamMembers.message.length > 0) {
+            res.json({ success: true, message: teamMembers.message });
+        } else if (teamMembers && teamMembers.message && teamMembers.message.length === 0) {
+            return res.status(404).json({ success: false, message: [] });
+        } else if (teamMembers?.error) {
+            return res.status(400).json({ success: false, error: teamMembers.error });
+        } else {
+            res.status(400).json({ success: false, error: 'Failed to check team members' });
+        }
     } catch (error) {
-      console.error('Error fetching team data:', error);
-      res.status(500).json({ error: 'Internal server error' });
+        console.error('Error fetching team data:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-  };
-
+};
 
   export const getProfileController = async (req, res) => {
     const { phoneNumber } = req.params;
@@ -150,21 +146,21 @@ export const submitFormController = async (req, res) => {
   };
 
   export const getTotalCommissionController = async (req, res) => {
-    const { mobileNumber } = req.query;
+    const { phoneNumber } = req.query;
   
     try {
-      if (!mobileNumber) {
-        return res.status(400).json({ success: false, message: 'Mobile number is required' });
+      if (!phoneNumber) {
+        return res.status(400).json({ success: false, message: 'Phone number is required' });
       }
   
-      const totalCommission = await getTotalCommissionService(mobileNumber, res);
+      const totalCommission = await getTotalCommissionService(phoneNumber, res);
       res.status(200).json({ totalCommission });
     } catch (error) {
       console.error('Error retrieving total commission:', error.message);
       res.status(500).json({ message: 'Internal server error' });
     }
   };
-
+  
   export const updateShopkeeperProfileController = async (req, res) => {
     const { phoneNumber } = req.params;
     const {
@@ -283,34 +279,8 @@ export const submitFormController = async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   };
-
   export const registerSalesController = async (req, res) => {
     const {
-      phoneNumber,
-      shopkeeperName,
-      shopID,
-      pincode,
-      shopState,
-      city,
-      address,
-      salesAssociateNumber,
-      selectedCategory,
-      selectedSubCategory,
-    } = req.body;
-
-    // if (!req.file) { return res.status(404).send({message: 'No image found',})};
-    const imageData = {
-      name: "",
-      buffer: "",
-      mimetype: ""
-    };
-    if(req.file){
-      imageData.name = req.file.originalname;
-      imageData.buffer = req.file.buffer;
-      imageData.mimetype = req.file.mimetype;
-    }
-    try {
-      const result = await registerSalesService({
         phoneNumber,
         shopkeeperName,
         shopID,
@@ -321,17 +291,42 @@ export const submitFormController = async (req, res) => {
         salesAssociateNumber,
         selectedCategory,
         selectedSubCategory,
-        imageData,
-      });
-  
-      res.status(result.status).json({ message: result.message });
-    } catch (error) {
-      console.error('Error registering shopkeeper:', error.message);
-      res.status(500).json({ message: error.message });
-    }
-  };
+    } = req.body;
 
-  
+    const imageData = {
+        name: "",
+        buffer: "",
+        mimetype: ""
+    };
+    if (req.file) {
+        imageData.name = req.file.originalname;
+        imageData.buffer = req.file.buffer;
+        imageData.mimetype = req.file.mimetype;
+    }
+
+    try {
+        const result = await registerSalesService({
+            phoneNumber,
+            shopkeeperName,
+            shopID,
+            pincode,
+            shopState,
+            city,
+            address,
+            salesAssociateNumber,
+            selectedCategory,
+            selectedSubCategory,
+            imageData, // Ensure imageData is included, even if it's empty
+        });
+
+        res.status(result.status).json({ message: result.message });
+    } catch (error) {
+        console.error('Error registering shopkeeper:', error.message);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 
   // export const registerSalesController = async (req, res) => {
   //   const {

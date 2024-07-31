@@ -57,20 +57,20 @@ export const registerCustomerService = async (phoneNumber, name, pincode, state,
         // Check if the phone number is already registered
         const existingUser = await findUserByPhoneNumber(phoneNumber, 'customer');
         if (existingUser) {
-            throw new Error('Phone number already registered');
+            return { status: 'error', message: 'Phone number already registered' };
         }
 
         // Check if shopID exists in shopkeepers database
         if (shopID) {
             const shopkeeper = await findUserByPhoneNumber(shopID, 'shopkeeper');
             if (!shopkeeper) {
-                throw new Error('ShopID not found');
+                return { status: 'error', message: 'ShopID not found' };
             }
         }
 
         const userData = { phoneNumber, name, pincode, state, city, address, shopID };
         const customer = await saveCustomer(userData);
-        return { success: true, data: customer, message: 'Customer registered successfully' };
+        return { status: 'success', data: customer, message: 'Customer registered successfully' };
     } catch (error) {
         throw new Error('Error in registerCustomerService: ' + error.message);
     }

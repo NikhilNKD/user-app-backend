@@ -22,25 +22,24 @@ export const getSalesExecutiveRepos = (transactionalEntityManager) => {
     return transactionalEntityManager ? transactionalEntityManager.getRepository(TblSalesExecutives) : AppDataSource.getRepository(TblSalesExecutives);
 };
 
-
-export const checkUserRepository = async (mobileNumber) => {
-  try {
-    const salesExecutiveRepository = AppDataSource.getRepository(TblSalesExecutives);
-    const user = await salesExecutiveRepository.findOne({ where: { phoneNumber: mobileNumber } });
-    return !!user;  // Returns true if user exists, false otherwise
-  } catch (error) {
-    throw new Error('Error in checkUserRepository: ' + error.message);
-  }
+export const checkUserRepository = async (phoneNumber) => {
+    try {
+        const salesExecutiveRepository = AppDataSource.getRepository(TblSalesExecutives);
+        const user = await salesExecutiveRepository.findOne({ where: { phoneNumber } });
+        return !!user;  // Returns true if user exists, false otherwise
+    } catch (error) {
+        throw new Error('Error in checkUserRepository: ' + error.message);
+    }
 };
+  
 
-
-export const submitFormRepository = async (firstName, lastName, mobileNumber, pincode, commissionLevel) => {
+  export const submitFormRepository = async (firstName, lastName, phoneNumber, pincode, commissionLevel) => {
 	try {
 	  const salesExecutiveRepository = AppDataSource.getRepository(TblSalesExecutives);
 	  const newSalesExecutive = salesExecutiveRepository.create({
 		firstName,
 		lastName,
-		phoneNumber: mobileNumber,
+		phoneNumber,
 		pincode,
 		level: commissionLevel,
 	  });
@@ -50,6 +49,7 @@ export const submitFormRepository = async (firstName, lastName, mobileNumber, pi
 	  throw new Error('Error in submitFormRepository: ' + error.message);
 	}
   };
+  
 
   export const submitTeamMemberRepository = async (teamMemberData) => {
 	try {
@@ -63,13 +63,13 @@ export const submitFormRepository = async (firstName, lastName, mobileNumber, pi
   };
 
   export const getMyTeamRepository = async (phoneNumber) => {
-	try {
-	  const salesExecutiveRepo = AppDataSource.getRepository(TblSalesExecutives);
-	  return await salesExecutiveRepo.find({ where: { addedBy: phoneNumber } });
-	} catch (error) {
-	  throw new Error('Error in getMyTeamRepository: ' + error.message);
-	}
-  };
+    try {
+        const salesExecutiveRepo = AppDataSource.getRepository(TblSalesExecutives);
+        return await salesExecutiveRepo.find({ where: { addedBy: phoneNumber } });
+    } catch (error) {
+        throw new Error('Error in getMyTeamRepository: ' + error.message);
+    }
+};
 
   export const getProfileRepository = async (phoneNumber) => {
 	try {
@@ -237,3 +237,5 @@ export const getCommissionAdjustmentRepository = async (fromLevel, toLevel) => {
 	  throw new Error('Error in getCommissionAdjustmentRepository: ' + error.message);
 	}
   };
+  
+ 

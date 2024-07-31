@@ -490,32 +490,69 @@
 //insertCategories();
 
 
-import { AppDataSource } from '../config/data-source.js'; // Adjust the path if needed
+//import { AppDataSource } from '../config/data-source.js'; // Adjust the path if needed
 
-const removePhoneNumberData = async () => {
-  let queryRunner;
+//const removePhoneNumberData = async () => {
+//  let queryRunner;
 
-  try {
-    console.log('Initializing the database connection...');
-    await AppDataSource.initialize();
-    console.log('Database connected successfully');
+//  try {
+//    console.log('Initializing the database connection...');
+//    await AppDataSource.initialize();
+//    console.log('Database connected successfully');
 
-    queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
+//    queryRunner = AppDataSource.createQueryRunner();
+//    await queryRunner.connect();
 
-    // Execute the query to delete data
-    await queryRunner.query(`DELETE FROM shopkeepers WHERE phoneNumber = '9058206605'`);
-    console.log('Data with phoneNumber 9058206605 removed successfully');
+//    // Execute the query to delete data
+//    await queryRunner.query(`DELETE FROM shopkeepers WHERE phoneNumber = '9058206605'`);
+//    console.log('Data with phoneNumber 9852145636 removed successfully');
 
-  } catch (error) {
-    console.error('Error removing data:', error.message);
-  } finally {
-    if (queryRunner) {
-      await queryRunner.release();
-    }
-    console.log('Closing the database connection...');
-    await AppDataSource.destroy();
-  }
-};
+//  } catch (error) {
+//    console.error('Error removing data:', error.message);
+//  } finally {
+//    if (queryRunner) {
+//      await queryRunner.release();
+//    }
+//    console.log('Closing the database connection...');
+//    await AppDataSource.destroy();
+//  }
+//};
 
-removePhoneNumberData();
+//removePhoneNumberData();
+
+
+//import { AppDataSource } from '../config/data-source.js'; // Adjust the path if needed
+
+//const fetchPhoneNumberData = async () => {
+//  let queryRunner;
+
+//  try {
+//    console.log('Initializing the database connection...');
+//    await AppDataSource.initialize();
+//    console.log('Database connected successfully');
+
+//    queryRunner = AppDataSource.createQueryRunner();
+//    await queryRunner.connect();
+
+//    // Execute the query to fetch data
+//    const result = await queryRunner.query(`SELECT * FROM shopkeepers WHERE phoneNumber = '9058206605'`);
+
+//    if (result.length > 0) {
+//      console.log('Data for phoneNumber 9058206605:', result);
+//    } else {
+//      console.log('No data found for phoneNumber 9058206605');
+//    }
+
+//  } catch (error) {
+//    console.error('Error fetching data:', error.message);
+//  } finally {
+//    if (queryRunner) {
+//      await queryRunner.release();
+//    }
+//    console.log('Closing the database connection...');
+//    await AppDataSource.destroy();
+//  }
+//};
+
+//fetchPhoneNumberData();
+
