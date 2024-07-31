@@ -42,12 +42,7 @@
 //updateCategoryTypes();
 
 
-// src/scripts/insertMainServices.js
-
-// src/scripts/insertMainServices.js
-// scripts/insertMainServices.js
-
-// scripts/updateMainServices.js
+ 
 
 //import dotenv from 'dotenv';
 //import { AppDataSource } from '../config/data-source.js';
@@ -307,59 +302,59 @@
 //removeSubcategories();
 
 
-import dotenv from 'dotenv';
-import { AppDataSource } from '../config/data-source.js';
-import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
-import { TblSalonMainServices } from '../entities/TblSalonMainServices.js';
-import { TblSelectedServices } from '../entities/TblSelectedServices.js';
-import { TblSalonSubSubServices } from '../entities/TblSalonSubSubServices.js'; // Import TblSalonSubSubServices
-import { Category } from '../entities/Category.js';
+//import dotenv from 'dotenv';
+//import { AppDataSource } from '../config/data-source.js';
+//import { TblSalonSubcategory } from '../entities/TblSalonSubcategory.js';
+//import { TblSalonMainServices } from '../entities/TblSalonMainServices.js';
+//import { TblSelectedServices } from '../entities/TblSelectedServices.js';
+//import { TblSalonSubSubServices } from '../entities/TblSalonSubSubServices.js'; // Import TblSalonSubSubServices
+//import { Category } from '../entities/Category.js';
 
-dotenv.config();
+//dotenv.config();
 
-const checkDataRemoval = async () => {
-  let queryRunner;
-  try {
-    console.log('Initializing the database connection...');
-    await AppDataSource.initialize();
-    console.log('Database connected successfully');
+//const checkDataRemoval = async () => {
+//  let queryRunner;
+//  try {
+//    console.log('Initializing the database connection...');
+//    await AppDataSource.initialize();
+//    console.log('Database connected successfully');
 
-    queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
+//    queryRunner = AppDataSource.createQueryRunner();
+//    await queryRunner.connect();
 
-    // Get repositories
-    const subcategoryRepository = queryRunner.manager.getRepository(TblSalonSubcategory);
-    const mainServiceRepository = queryRunner.manager.getRepository(TblSalonMainServices);
-    const selectedServicesRepository = queryRunner.manager.getRepository(TblSelectedServices);
-    const subSubServicesRepository = queryRunner.manager.getRepository(TblSalonSubSubServices); // Add repository for TblSalonSubSubServices
-    const categoryRepository = queryRunner.manager.getRepository(Category);
+//    // Get repositories
+//    const subcategoryRepository = queryRunner.manager.getRepository(TblSalonSubcategory);
+//    const mainServiceRepository = queryRunner.manager.getRepository(TblSalonMainServices);
+//    const selectedServicesRepository = queryRunner.manager.getRepository(TblSelectedServices);
+//    const subSubServicesRepository = queryRunner.manager.getRepository(TblSalonSubSubServices); // Add repository for TblSalonSubSubServices
+//    const categoryRepository = queryRunner.manager.getRepository(Category);
 
-    // Fetch data from tables
-    const subcategories = await subcategoryRepository.find();
-    const mainServices = await mainServiceRepository.find();
-    const selectedServices = await selectedServicesRepository.find();
-    const subSubServices = await subSubServicesRepository.find(); // Fetch data from TblSalonSubSubServices
-    const categories = await categoryRepository.find();
+//    // Fetch data from tables
+//    const subcategories = await subcategoryRepository.find();
+//    const mainServices = await mainServiceRepository.find();
+//    const selectedServices = await selectedServicesRepository.find();
+//    const subSubServices = await subSubServicesRepository.find(); // Fetch data from TblSalonSubSubServices
+//    const categories = await categoryRepository.find();
 
-    // Log results
-    console.log('Categories:', categories);
-    console.log('Subcategories:', subcategories);
-    console.log('Main Services:', mainServices);
-    console.log('Selected Services:', selectedServices);
-    console.log('Sub-Sub Services:', subSubServices); // Log data for TblSalonSubSubServices
+//    // Log results
+//    console.log('Categories:', categories);
+//    console.log('Subcategories:', subcategories);
+//    console.log('Main Services:', mainServices);
+//    console.log('Selected Services:', selectedServices);
+//    console.log('Sub-Sub Services:', subSubServices); // Log data for TblSalonSubSubServices
 
-  } catch (error) {
-    console.error('Error checking data removal:', error.message);
-  } finally {
-    if (queryRunner) {
-      await queryRunner.release();
-    }
-    console.log('Closing the database connection...');
-    await AppDataSource.destroy();
-  }
-};
+//  } catch (error) {
+//    console.error('Error checking data removal:', error.message);
+//  } finally {
+//    if (queryRunner) {
+//      await queryRunner.release();
+//    }
+//    console.log('Closing the database connection...');
+//    await AppDataSource.destroy();
+//  }
+//};
 
-checkDataRemoval();
+//checkDataRemoval();
 
 
 
@@ -493,3 +488,71 @@ checkDataRemoval();
 //};
 
 //insertCategories();
+
+
+//import { AppDataSource } from '../config/data-source.js'; // Adjust the path if needed
+
+//const removePhoneNumberData = async () => {
+//  let queryRunner;
+
+//  try {
+//    console.log('Initializing the database connection...');
+//    await AppDataSource.initialize();
+//    console.log('Database connected successfully');
+
+//    queryRunner = AppDataSource.createQueryRunner();
+//    await queryRunner.connect();
+
+//    // Execute the query to delete data
+//    await queryRunner.query(`DELETE FROM shopkeepers WHERE phoneNumber = '9058206605'`);
+//    console.log('Data with phoneNumber 9852145636 removed successfully');
+
+//  } catch (error) {
+//    console.error('Error removing data:', error.message);
+//  } finally {
+//    if (queryRunner) {
+//      await queryRunner.release();
+//    }
+//    console.log('Closing the database connection...');
+//    await AppDataSource.destroy();
+//  }
+//};
+
+//removePhoneNumberData();
+
+
+//import { AppDataSource } from '../config/data-source.js'; // Adjust the path if needed
+
+//const fetchPhoneNumberData = async () => {
+//  let queryRunner;
+
+//  try {
+//    console.log('Initializing the database connection...');
+//    await AppDataSource.initialize();
+//    console.log('Database connected successfully');
+
+//    queryRunner = AppDataSource.createQueryRunner();
+//    await queryRunner.connect();
+
+//    // Execute the query to fetch data
+//    const result = await queryRunner.query(`SELECT * FROM shopkeepers WHERE phoneNumber = '9058206605'`);
+
+//    if (result.length > 0) {
+//      console.log('Data for phoneNumber 9058206605:', result);
+//    } else {
+//      console.log('No data found for phoneNumber 9058206605');
+//    }
+
+//  } catch (error) {
+//    console.error('Error fetching data:', error.message);
+//  } finally {
+//    if (queryRunner) {
+//      await queryRunner.release();
+//    }
+//    console.log('Closing the database connection...');
+//    await AppDataSource.destroy();
+//  }
+//};
+
+//fetchPhoneNumberData();
+

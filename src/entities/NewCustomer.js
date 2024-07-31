@@ -12,6 +12,7 @@ export const NewCustomer = new EntitySchema({
     phoneNumber: {
       type: 'varchar',
       length: 15,
+      unique:true
     },
     name: {
       type: 'varchar',

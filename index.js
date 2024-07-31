@@ -458,27 +458,27 @@ app.use('/api', routes);
 ////  });
 ////});
 
-////app.get('/shopkeeper', (req, res) => {
-////  const phoneNumber = req.query.phoneNumber;
+app.get('/shopkeeper', (req, res) => {
+  const phoneNumber = req.query.phoneNumber;
 
-////  if (!phoneNumber) {
-////    return res.status(400).json({ error: 'Phone number is required' });
-////  }
+  if (!phoneNumber) {
+    return res.status(400).json({ error: 'Phone number is required' });
+  }
 
-////  db.query(
-////    'SELECT * FROM shopkeepers WHERE phoneNumber = ?',
-////    [phoneNumber],
-////    (err, results) => {
-////      if (err) {
-////        return res.status(500).json({ error: 'Database query failed' });
-////      }
-////      if (results.length === 0) {
-////        return res.status(404).json({ error: 'Shopkeeper not found' });
-////      }
-////      res.json(results[0]);
-////    }
-////  );
-//// });
+  db.query(
+    'SELECT * FROM shopkeepers WHERE phoneNumber = ?',
+    [phoneNumber],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database query failed' });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Shopkeeper not found' });
+      }
+      res.json(results[0]);
+    }
+  );
+ });
 
 
 

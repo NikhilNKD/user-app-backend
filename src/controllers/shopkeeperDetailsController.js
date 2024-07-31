@@ -2,7 +2,8 @@ import {
     getShopkeeperDetailsByPhoneNumberService,
     getShopkeeperDetailsByShopIDService,
     getShopkeeperServiceDetailsByPhoneNumberService,
-    getShopkeeperProductHomeDetailsByPhoneNumberService
+    getShopkeeperProductHomeDetailsByPhoneNumberService,
+    getShopkeeperByPhoneNumber 
 } from '../services/shopkeeperDetailsService.js';
 
 // Get shopkeeper details by phone number
@@ -41,9 +42,12 @@ export const getShopkeeperDetailsByShopIDController = async (req, res) => {
 export const getShopkeeperServiceDetailsController = async (req, res) => {
     try {
         const { phoneNumber } = req.params;
+        console.log(`Received phoneNumber: ${phoneNumber}`);  // Debugging statement
         const result = await getShopkeeperServiceDetailsByPhoneNumberService(phoneNumber);
+        console.log('Service Result:', result);  // Debugging statement
         res.status(result.status).json(result);
     } catch (error) {
+        console.error('Controller Error:', error);  // Debugging statement
         res.status(500).json({
             success: false,
             data: null,
@@ -52,7 +56,6 @@ export const getShopkeeperServiceDetailsController = async (req, res) => {
         });
     }
 };
-
 // Get shopkeeper product home details
 export const getShopkeeperProductHomeDetailsController = async (req, res) => {
     try {
@@ -71,3 +74,22 @@ export const getShopkeeperProductHomeDetailsController = async (req, res) => {
         });
     }
 };
+
+
+export const getShopkeeper = async (req, res) => {
+    const phoneNumber = req.query.phoneNumber;
+  
+    if (!phoneNumber) {
+      return res.status(400).json({ error: 'Phone number is required' });
+    }
+  
+    try {
+      const shopkeeper = await getShopkeeperByPhoneNumber(phoneNumber);
+      if (!shopkeeper) {
+        return res.status(404).json({ error: 'Shopkeeper not found' });
+      }
+      res.json(shopkeeper);
+    } catch (error) {
+      res.status(500).json({ error: 'Database query failed', details: error.message });
+    }
+  };
