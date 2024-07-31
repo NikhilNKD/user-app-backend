@@ -5,7 +5,6 @@ import { openai } from '../../openAIconfig.js';
 import vision from '@google-cloud/vision';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { getChatGPTResponse } from './openaiservice.js';
 import { InternalServerError } from '../utils/errorHandlers.js';
 import { parseOpenAIResponse } from '../utils/helper.js';
 const __filename = fileURLToPath(import.meta.url);
