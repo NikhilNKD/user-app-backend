@@ -9,6 +9,7 @@ import {
   saveUser,
 } from '../repositories/authRepository.js';
 import jwt from 'jsonwebtoken';
+import { BadRequestError, CustomError, InternalServerError, NotFoundError } from '../utils/errorHandlers.js';
 
 export const generateOtp = async (phoneNumber) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -21,10 +22,7 @@ export const generateOtp = async (phoneNumber) => {
     const timeSinceLastOtp = currentTime - (new Date(lastOtpRequest.otpExpiry).getTime() - (9 * 60000));
     const recentOtpThreshold = 0; // 1 minute in milliseconds
     if (timeSinceLastOtp < recentOtpThreshold) {
-      return {
-        status: 'failed',
-        message: 'OTP already sent recently. Please wait before requesting another OTP.'
-      };
+      throw new BadRequestError('OTP already sent recently. Please wait before requesting another OTP.')
     }
     await removeOtp(lastOtpRequest); 
   }
@@ -47,19 +45,12 @@ export const generateOtp = async (phoneNumber) => {
         await saveOtp({ phoneNumber, otp, otpExpiry });
         return { status: 'success', message: 'OTP sent successfully' };
       } else {
-        return {
-          status: 'failed',
-          message: messageData.ErrorMessage,
-          code: messageData.ErrorCode,
-        };
+        throw new CustomError(messageData.ErrorMessage || "something went wrong",messageData.ErrorCode)
       }
     })
     .catch((error) => {
-      console.log(error);
-      return { status: 'failed', message: error.message };
-      // res.status(500).json({ message: 'Internal server error', error: error.message });
+      throw error
     });
-
     return result
 };
 
@@ -70,14 +61,12 @@ export const validateOtp = async (phoneNumber, otp) => {
     if (!savedOtp || savedOtp.otp !== otp || new Date() > savedOtp.otpExpiry) {
       if (savedOtp && new Date() > savedOtp.otpExpiry) {
         await removeOtp(savedOtp); // Remove expired OTP
+        throw new BadRequestError("Otp expired");
       }
-      return 'Invalid or expired OTP';
+      throw new NotFoundError("Invalid or expired OTP");
     }
-
     // await removeOtp(savedOtp);
-
     let user = await findUserByPhoneNumber(phoneNumber);
-    console.log(user, "---")
     let message;
     if (!user) {
       user = await saveUser({ phoneNumber });
@@ -91,6 +80,6 @@ export const validateOtp = async (phoneNumber, otp) => {
     });
     return { message, token, phoneNumber: user.phoneNumber};
   } catch (error) {
-    throw new Error('Could not validate OTP', error.message);
+    throw error
   }
 };

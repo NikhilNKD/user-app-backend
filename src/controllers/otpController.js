@@ -1,26 +1,38 @@
 import { generateOtp, validateOtp } from '../services/otpService.js';
+import { BadRequestError } from '../utils/errorHandlers.js';
 
 export const generateOtpController = async (req, res) => {
   try {
     const { phoneNumber } = req.body;
-    console.log(req.body)
+    if (!req.body) throw new BadRequestError('Request body is missing.');
+    if (!phoneNumber) throw new BadRequestError('phone number is required.');
     const result = await generateOtp(phoneNumber);
     res.json(result);
   } catch (error) {
-    console.log("Error: ",error);
-    res
-      .status(500)
-      .json({ message: 'Internal server error', error: error.message });
+    console.log('Error: ', error);
+    res.status(error.statusCode || 500).json({
+      success: false,
+      data: null,
+      message: error.message || 'Error while generating otp',
+      error: error.message,
+    });
   }
 };
 
 export const validateOtpController = async (req, res) => {
   try {
     const { phoneNumber, otp } = req.body;
+    if (!req.body) throw new BadRequestError('Request body is missing.');
+    if (!phoneNumber) throw new BadRequestError('phone number is required.');
+    if (!otp) throw new BadRequestError('otp is required.');
     const result = await validateOtp(phoneNumber, otp);
-      res.json(result);
-    
+    res.json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(error.statusCode || 500).json({
+      success: false,
+      data: null,
+      message: error.message || 'Error while validating otp',
+      error: error.message,
+    });
   }
 };

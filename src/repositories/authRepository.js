@@ -17,8 +17,7 @@ export const saveUser = async (userData) => {
         await repository.save(user);
         return user;
     } catch (error) {
-        console.error('Error in saveUser:', error);
-        throw new Error('Error saving user: ' + error.message);
+        throw error;
     }
 };
 
@@ -29,8 +28,7 @@ export const saveCustomer = async (userData) => {
         await repository.save(customer);
         return customer;
     } catch (error) {
-        console.error('Error in saveCustomer:', error);
-        throw new Error('Error saving customer: ' + error.message);
+        throw error;
     }
 };
 
