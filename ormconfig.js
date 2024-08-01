@@ -5,7 +5,7 @@ export const config = {
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    synchronize: true,
+    synchronize: false,
     logging: true,
     entities: [
        'src/entities/*.js',
