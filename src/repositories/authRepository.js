@@ -7,7 +7,6 @@ export const findUserByPhoneNumber = async (phoneNumber, userType) => {
         ? AppDataSource.getRepository(Shopkeeper)
         : AppDataSource.getRepository(NewCustomer);
     const user = await repository.findOne({ where: { phoneNumber } });
-    console.log(user, "fkdkf;klklk")
     return user;
 };
 export const saveUser = async (userData) => {

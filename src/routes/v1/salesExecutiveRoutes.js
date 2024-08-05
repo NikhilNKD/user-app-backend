@@ -3,6 +3,7 @@
 import { Router } from 'express';
 import { calculateTotalCommissionController, checkSalesAssociateController, checkUserController ,getCommissionByLevelController,getMyTeamController,getProfileController,getShopsController,getTotalCommissionController,getUserLevelController,registerSalesController,submitFormController, submitTeamMemberController, updateProfileController, updateShopkeeperProfileController } from '../../controllers/salesExecutiveController.js';
 import { uploadS3 } from '../../utils/helper.js';
+import { authenticateToken } from "../../middleware/authenticateToken.js"
 const router = Router();
 
 router.post('/check-user', checkUserController);  // Route to check if user exists
@@ -19,7 +20,10 @@ router.get('/check-sales-associate/:phoneNumber', checkSalesAssociateController)
 router.get('/commission/:level', getCommissionByLevelController); // Example route for checking sales associate number
 router.get('/user-level/:phoneNumber', getUserLevelController); // Example route for checking sales associate number
 
-router.post('/register-sales', uploadS3.single('image'), registerSalesController); // Route to submit the form
+router.post('/register-sales', uploadS3.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'banner', maxCount: 1 }
+  ]), registerSalesController); // Route to submit the form
 // depreciated
 router.get('/total-commission/:mobileNumber', calculateTotalCommissionController); // Example route for checking sales associate number
 

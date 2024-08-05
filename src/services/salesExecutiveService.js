@@ -1,11 +1,12 @@
 // src/services/salesExecutiveService.js
 
-import { checkUserRepository,submitFormRepository,getShopkeeperRepo, getSalesExecutiveRepos, getCommissionRepo, getTblCommissionRepo, updateShopkeeperProfileRepository, checkSalesAssociateRepository, getCommissionByLevelRepository, getUserLevelRepository, getUserLevelAndAddedByRepository, getCommissionAmountRepository, getCommissionAdjustmentRepository, submitTeamMemberRepository, getMyTeamRepository, getProfileRepository, updateProfileRepository, getShopsRepository  } from '../repositories/salesExecutiveRepository.js';
+import { checkSalesRepository,submitFormRepository,getShopkeeperRepo, getSalesExecutiveRepos, getCommissionRepo, getTblCommissionRepo, updateShopkeeperProfileRepository, checkSalesAssociateRepository, getCommissionByLevelRepository, getUserLevelRepository, getUserLevelAndAddedByRepository, getCommissionAmountRepository, getCommissionAdjustmentRepository, submitTeamMemberRepository, getMyTeamRepository, getProfileRepository, updateProfileRepository, getShopsRepository  } from '../repositories/salesExecutiveRepository.js';
 import { AppDataSource } from '../config/data-source.js';
 import { uploadImage } from './s3Service.js';
+import { ConflictError, InternalServerError, NotFoundError } from '../utils/errorHandlers.js';
 export const checkUserService = async (phoneNumber) => {
   try {
-    return await checkUserRepository(phoneNumber);
+    return await checkSalesRepository(phoneNumber);
   } catch (error) {
     throw new Error('Error in checkUserService: ' + error.message);
   }
@@ -13,48 +14,52 @@ export const checkUserService = async (phoneNumber) => {
 
 export const submitFormService = async (firstName, lastName, phoneNumber, pincode, commissionLevel) => {
   try {
-    return await submitFormRepository(firstName, lastName, phoneNumber, pincode, commissionLevel);
+    const exists = await checkSalesRepository(phoneNumber);
+    console.log(exists, "ll")
+    if(exists) throw new ConflictError("User already exists");
+    const salesexecutive = await submitFormRepository(firstName, lastName, phoneNumber, pincode, commissionLevel);
+    console.log("salesexecutive", salesexecutive)
+    return salesexecutive;
   } catch (error) {
-    throw new Error('Error in submitFormService: ' + error.message);
+    throw error;
   }
 };
 
   export const submitTeamMemberService = async (teamMemberData) => {
     try {
-      console.log(teamMemberData, teamMemberData.addedBy);
-      const addedBy = await checkUserRepository(teamMemberData.addedBy); 
-      const checkMember = await checkUserRepository(teamMemberData.phoneNumber); 
+      const addedBy = await checkSalesRepository(teamMemberData.addedBy); 
+      const checkMember = await checkSalesRepository(teamMemberData.phoneNumber); 
       if(!addedBy){
-        return {error: "addedBy not exists"}
+        throw new NotFoundError("addedBy not exists");
       }
       if(checkMember){
-        return {error: "user exists"}
+        throw new ConflictError("User exists");
       }
       const newMemberAdded =  await submitTeamMemberRepository(teamMemberData);
       if(newMemberAdded){
         return {message: "Successfully added"}
       }
-      return false;
+     throw new InternalServerError("Failed to add team member")
     } catch (error) {
-      throw new Error('Error in submitTeamMemberService: ' + error.message);
+      throw error;
     }
   };
 
   export const getMyTeamService = async (phoneNumber) => {
     try {
-        const checkUser = await checkUserRepository(phoneNumber); 
-        if (!checkUser) return { error: "User does not exist" };
+        const checkUser = await checkSalesRepository(phoneNumber); 
+        if (!checkUser) throw new NotFoundError("User does not exist");
 
         const team = await getMyTeamRepository(phoneNumber);
         return { message: team };
     } catch (error) {
-        throw new Error('Error in getMyTeamService: ' + error.message);
+      throw error;
     }
 };
 
   export const getProfileService = async (phoneNumber) => {
     try {
-      // const checkUser = await checkUserRepository(phoneNumber); 
+      // const checkUser = await checkSalesRepository(phoneNumber); 
       // if (!checkUser) return {error: "user not exists"}
       const data =  await getProfileRepository(phoneNumber);
       if (!data) return {error: "user not exists"}
@@ -66,7 +71,7 @@ export const submitFormService = async (firstName, lastName, phoneNumber, pincod
 
   export const updateProfileService = async (phoneNumber, updates) => {
     try {
-      // const checkUser = await checkUserRepository(phoneNumber); 
+      // const checkUser = await checkSalesRepository(phoneNumber); 
       // if (!checkUser) return {error: "user not exists"}
       const data =  await updateProfileRepository(phoneNumber, updates);
       if(!data) return {error: "Profile not found"}

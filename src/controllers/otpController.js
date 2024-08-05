@@ -21,11 +21,11 @@ export const generateOtpController = async (req, res) => {
 
 export const validateOtpController = async (req, res) => {
   try {
-    const { phoneNumber, otp } = req.body;
+    const { phoneNumber, otp, type } = req.body;
     if (!req.body) throw new BadRequestError('Request body is missing.');
     if (!phoneNumber) throw new BadRequestError('phone number is required.');
     if (!otp) throw new BadRequestError('otp is required.');
-    const result = await validateOtp(phoneNumber, otp);
+    const result = await validateOtp(phoneNumber, otp, type);
     res.json(result);
   } catch (error) {
     res.status(error.statusCode || 500).json({

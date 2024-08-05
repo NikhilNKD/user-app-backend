@@ -3,8 +3,136 @@ import {
     getShopkeeperDetailsByShopIDService,
     getShopkeeperServiceDetailsByPhoneNumberService,
     getShopkeeperProductHomeDetailsByPhoneNumberService,
-    getShopkeeperByPhoneNumber 
+    getShopkeeperByPhoneNumber ,
+    getShopkeeperOrdersService, 
+    registerShopkeeperService,
+    getCustomersService,
+    getProductsByShopkeeperService
 } from '../services/shopkeeperDetailsService.js';
+
+import { NotFoundError } from '../utils/errorHandlers.js';
+
+export const registerShopkeeperController = async(req, res) =>{
+    const {
+        phoneNumber,
+        shopkeeperName,
+        shopID,
+        pincode,
+        shopState,
+        city,
+        address,
+        salesAssociateNumber,
+        selectedCategory,
+        selectedSubCategory,
+    } = req.body;
+    const imageData = req.files['image'] ? req.files['image'][0] : null;
+    const bannerData = req.files['banner'] ? req.files['banner'][0] : null;
+
+    try {
+        const result = await registerShopkeeperService({
+            phoneNumber,
+            shopkeeperName,
+            shopID,
+            pincode,
+            shopState,
+            city,
+            address,
+            salesAssociateNumber,
+            selectedCategory,
+            selectedSubCategory,
+            imageData, 
+            bannerData
+        });
+
+        res.status(result.status).json({ message: result.message, data: result.data });
+    } catch (error) {
+        console.log('Error registering shopkeeper:', error.message);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            data: null,
+            message: error.message || 'Error while registering shopkeeper',
+            error: error.message,
+          });
+    }
+}
+
+// Get shopkeeper orders by shopid
+export const myOrderShopkeeperController = async(req, res) => {
+    try {
+        const { shopID } = req.query;
+
+        if (!shopID) {
+         throw new NotFoundError('Shop ID is required');
+        }
+    
+        const orders = await getShopkeeperOrdersService(shopID);
+    
+        res.status(200).json({
+          message: 'Orders retrieved successfully',
+          data: orders
+        });
+    } catch (error) {
+        console.log('Error myOrderShopkeeperController: ', error.message);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            data: null,
+            message: error.message || 'Error while registering shopkeeper',
+            error: error.message,
+          });
+    }
+}
+
+// Get shopkeeper customers by shopid
+export const getCustomersByShopkeeperController = async(req, res) => {
+    try {
+        const { shopID } = req.query;
+
+    if (!shopID) {
+        throw new NotFoundError('Shop ID is required');
+    }
+
+    const customers = await getCustomersService(shopID);
+
+    res.status(200).json({
+      message: 'Customers retrieved successfully',
+      data: customers
+    });
+    } catch (error) {
+        console.log('Error getCustomersByShopkeeperController: ', error.message);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            data: null,
+            message: error.message || 'Error while registering shopkeeper',
+            error: error.message,
+          });
+    }
+}
+
+// Get shopkeeper details by phone number
+export const productManagerShopkeeperController = async (req, res) => {
+    try {
+        const { phoneNumber } = req.query;
+
+        if (!phoneNumber) {
+        return res.status(400).json({ message: 'Phone number is required' });
+        }
+
+    const products = await getProductsByShopkeeperService(phoneNumber);
+
+    res.status(200).json({
+      message: 'Products retrieved successfully',
+      data: products
+    });
+    } catch (error) {
+        console.log('Error productManagerShopkeeperController: ', error.message);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            data: null,
+            message: error.message || 'Error while registering shopkeeper',
+            error: error.message,
+          });
+    }
+}
 
 // Get shopkeeper details by phone number
 export const getShopkeeperDetailsByPhoneNumberController = async (req, res) => {

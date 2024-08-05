@@ -4,6 +4,7 @@ import { Shopkeeper } from '../entities/Shopkeeper.js';
 import { Commission } from '../entities/Commission.js';
 import { TblCommission } from '../entities/TblCommission.js';
 import { CommissionLevel } from '../entities/CommissionLevel.js';
+import { InternalServerError } from '../utils/errorHandlers.js';
 
 
 export const getShopkeeperRepo = (transactionalEntityManager) => {
@@ -22,13 +23,13 @@ export const getSalesExecutiveRepos = (transactionalEntityManager) => {
     return transactionalEntityManager ? transactionalEntityManager.getRepository(TblSalesExecutives) : AppDataSource.getRepository(TblSalesExecutives);
 };
 
-export const checkUserRepository = async (phoneNumber) => {
+export const checkSalesRepository = async (phoneNumber) => {
     try {
         const salesExecutiveRepository = AppDataSource.getRepository(TblSalesExecutives);
         const user = await salesExecutiveRepository.findOne({ where: { phoneNumber } });
         return !!user;  // Returns true if user exists, false otherwise
     } catch (error) {
-        throw new Error('Error in checkUserRepository: ' + error.message);
+        throw new InternalServerError("Something went wrong while saving data")
     }
 };
   
@@ -43,10 +44,9 @@ export const checkUserRepository = async (phoneNumber) => {
 		pincode,
 		level: commissionLevel,
 	  });
-	  await salesExecutiveRepository.save(newSalesExecutive);
-	  return true;
+	  return await salesExecutiveRepository.save(newSalesExecutive);
 	} catch (error) {
-	  throw new Error('Error in submitFormRepository: ' + error.message);
+	  throw new InternalServerError("Something went wrong while saving data");
 	}
   };
   
@@ -58,7 +58,7 @@ export const checkUserRepository = async (phoneNumber) => {
 	  await salesExecutiveRepo.save(newTeamMember);
 	  return true;
 	} catch (error) {
-	  throw new Error('Error in submitTeamMemberRepository: ' + error.message);
+		throw new InternalServerError("Errow in Team Repository");
 	}
   };
 
@@ -67,7 +67,7 @@ export const checkUserRepository = async (phoneNumber) => {
         const salesExecutiveRepo = AppDataSource.getRepository(TblSalesExecutives);
         return await salesExecutiveRepo.find({ where: { addedBy: phoneNumber } });
     } catch (error) {
-        throw new Error('Error in getMyTeamRepository: ' + error.message);
+        throw new InternalServerError("Errow in getting Team Repository");
     }
 };
 
@@ -76,7 +76,7 @@ export const checkUserRepository = async (phoneNumber) => {
 	  const salesExecutiveRepo = AppDataSource.getRepository(TblSalesExecutives);
 	  return await salesExecutiveRepo.findOne({ where: { phoneNumber: phoneNumber } });
 	} catch (error) {
-	  throw new Error('Error in getProfileRepository: ' + error.message);
+		throw new InternalServerError("Errow in getProfileRepository");
 	}
   };
 
@@ -87,7 +87,7 @@ export const checkUserRepository = async (phoneNumber) => {
 		console.log(result, "fdfkjdkklk")
 	  return result.affected > 0; // Returns true if the update was successful
 	} catch (error) {
-	  throw new Error('Error in updateProfileRepository: ' + error.message);
+		throw new InternalServerError('Error in updateProfileRepository: ' + error.message);
 	}
   };
 

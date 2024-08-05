@@ -1,6 +1,7 @@
 // src/controllers/customerAddressController.js
 
 import { getCustomerAddressService } from '../services/customerAddressService.js';
+import { NotFoundError } from '../utils/errorHandlers.js';
 
 export const getCustomerAddressController = async (req, res) => {
   const { phoneNumber } = req.query;  // Extract from query string
@@ -12,12 +13,16 @@ export const getCustomerAddressController = async (req, res) => {
 
     const address = await getCustomerAddressService(phoneNumber);
     if (!address) {
-      return res.status(404).json({ success: false, message: 'Address not found for this phone number' });
+      throw new NotFoundError('Address not found for this phone number')
     }
-
     res.json({ success: true, address });
   } catch (error) {
-    console.error('Error in getCustomerAddressController:', error);
-    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+    console.error('Error in getCustomerAddressController:', error.message);
+    res.status(error.statusCode || 500).json({
+      success: false,
+      data: null,
+      message: error.message || 'Error while fetching Customer Address',
+      error: error.message
+    });
   }
 };

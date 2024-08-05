@@ -1,15 +1,10 @@
 import { createCategoriesService, getAllCategories, getSubCategoriesByCategoryId, createSubCategoryService, getCategoryByName } from '../services/categoryService.js';
+import { NotFoundError } from '../utils/errorHandlers.js';
 
 export const fetchCategoryByName = async (req, res) => {
   const { name } = req.query;
 
-  if (!name) {
-    return res.status(400).json({
-      success: false,
-      data: null,
-      message: 'Category name is required',
-    });
-  }
+  if (!name) throw new NotFoundError("Category name is required");
 
   try {
     const category = await getCategoryByName(name);
@@ -20,18 +15,14 @@ export const fetchCategoryByName = async (req, res) => {
         message: 'Category fetched successfully',
       });
     } else {
-      res.status(404).json({
-        success: false,
-        data: null,
-        message: 'Category not found',
-      });
+      throw new NotFoundError("Category not found");
     }
   } catch (error) {
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
       data: null,
-      message: 'Internal server error',
-      error: error.message,
+      message: error.message || 'Error while fetching category',
+      error: error.message
     });
   }
 };
@@ -46,10 +37,10 @@ export const createCategories = async (req, res) => {
       message: 'Categories added successfully'
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
       data: null,
-      message: 'Internal server error',
+      message: error.message || 'Error while creating category',
       error: error.message
     });
   }
@@ -64,10 +55,10 @@ export const fetchCategories = async (req, res) => {
       message: 'Categories fetched successfully'
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
-      data: [],
-      message: 'Internal server error',
+      data: null,
+      message: error.message || 'Error while fetching category',
       error: error.message
     });
   }
@@ -83,10 +74,10 @@ export const fetchSubCategories = async (req, res) => {
       message: 'Sub-categories fetched successfully'
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
-      data: [],
-      message: 'Internal server error',
+      data: null,
+      message: error.message || 'Error while fetching sub category',
       error: error.message
     });
   }
@@ -102,10 +93,10 @@ export const createSubCategories = async (req, res) => {
       message: 'Sub-categories added successfully'
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(error.statusCode || 500).json({
       success: false,
       data: null,
-      message: 'Internal server error',
+      message: error.message || 'Error while creating sub category',
       error: error.message
     });
   }

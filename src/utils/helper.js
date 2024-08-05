@@ -1,5 +1,19 @@
 import multer from "multer";
+import { uploadImage } from "../services/s3Service.js";
 export const uploadS3 = multer({ storage: multer.memoryStorage() });
+
+export const uploadImageToS3 = async(imageData,key) =>{
+    // let key;
+      if (imageData.buffer) {
+        key = key;
+        try {
+         const data =  await uploadImage(imageData, key)
+         return data
+        } catch (error) {
+          throw new Error (error.message)
+        }
+      }
+  }
 
 export const parseOpenAIResponse = async (content) => {
     const extractValue = (label) => {

@@ -48,6 +48,8 @@ app.use(bodyParser.json());  // To parse JSON bodies
 
 app.use('/api', routes);
 
+
+
 //// to check weather the number is present in the which database
 ///*****************************************To check whether the phonenumber exist in database if yes which************************************************************************************************************************ */
 ////app.post('/checkPhoneNumber', (req, res) => {

@@ -15,7 +15,6 @@ export const uploadImage = async (file, key) => {
 
         const command = new PutObjectCommand(params);
         const data = await s3Client.send(command);
-        console.log(data)
         if(data.$metadata.httpStatusCode == 200){
             const imageUrl = `https://${bucketName}.s3.amazonaws.com/${key}`;
             return imageUrl;

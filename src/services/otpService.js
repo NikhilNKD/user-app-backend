@@ -10,6 +10,7 @@ import {
 } from '../repositories/authRepository.js';
 import jwt from 'jsonwebtoken';
 import { BadRequestError, CustomError, InternalServerError, NotFoundError } from '../utils/errorHandlers.js';
+import { checkSalesRepository, submitFormRepository } from '../repositories/salesExecutiveRepository.js';
 
 export const generateOtp = async (phoneNumber) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -54,7 +55,7 @@ export const generateOtp = async (phoneNumber) => {
     return result
 };
 
-export const validateOtp = async (phoneNumber, otp) => {
+export const validateOtp = async (phoneNumber, otp, type) => {
   try {
     const savedOtp = await findOtpByPhoneNumber(phoneNumber);
 
@@ -66,16 +67,24 @@ export const validateOtp = async (phoneNumber, otp) => {
       throw new NotFoundError("Invalid or expired OTP");
     }
     // await removeOtp(savedOtp);
-    let user = await findUserByPhoneNumber(phoneNumber);
+    let user = null
+    if(type == "shopkeeper"){
+      user = await findUserByPhoneNumber(phoneNumber);
+    }else if(type == "sales"){
+      user = await checkSalesRepository(phoneNumber)
+    }
     let message;
-    if (!user) {
+    if (!user && type == "shopkeeper") {
       user = await saveUser({ phoneNumber });
       message = 'Sign up successful';
-    } else {
+    }else if(!user && type == "sales"){
+      user = await submitFormRepository(null, null, phoneNumber, null, "L0");
+      message = 'Sign up successful';
+    }else {
       message = 'Sign in successful';
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user.id, phoneNumber}, process.env.JWT_SECRET, {
       expiresIn: '1h',
     });
     return { message, token, phoneNumber: user.phoneNumber};

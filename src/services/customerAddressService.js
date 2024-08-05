@@ -6,6 +6,6 @@ export const getCustomerAddressService = async (phoneNumber) => {
   try {
     return await getCustomerAddressRepository(phoneNumber);
   } catch (error) {
-    throw new Error('Error in getCustomerAddressService: ' + error.message);
+    throw error
   }
 };

@@ -5,10 +5,30 @@ import {
     getShopkeeperDetailsByShopIDController,
     getShopkeeperServiceDetailsController,
     getShopkeeperProductHomeDetailsController,
-    getShopkeeper
+    getShopkeeper,
+    registerShopkeeperController,
+    myOrderShopkeeperController,
+    getCustomersByShopkeeperController,
+    productManagerShopkeeperController
 } from '../../controllers/shopkeeperDetailsController.js';
+import { uploadS3 } from '../../utils/helper.js';
 
 const router = Router();
+
+// Route to register shopkeeper 
+router.post('/register-shopkeeper', uploadS3.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'banner', maxCount: 1 }
+  ]), registerShopkeeperController);
+
+// Route to get shopkeeper orders by shopID
+router.get('/my-orders', myOrderShopkeeperController);
+
+// Route to get shopkeeper customers by shopID
+router.get('/shopkeeper-customers', getCustomersByShopkeeperController);
+
+// Route to get shopkeeper customers by shopID
+router.get('/shopkeeper-products', productManagerShopkeeperController);
 
 // Route to get shopkeeper details by phone number
 router.get('/details/:phoneNumber', getShopkeeperDetailsByPhoneNumberController);

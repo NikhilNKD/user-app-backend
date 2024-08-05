@@ -1,7 +1,5 @@
 // src/services/mainServiceService.js
 import { getMainServicesBySubCategoryRepository ,getSubServicesByMainServiceId,saveSelectedServices,getSelectedMainServicesRepository,getSelectedSubServicesRepository   } from '../repositories/shopkeeperServiceRepository.js';
- 
-
 
 export const getMainServicesBySubCategoryService = async (subCategory) => {
     try {

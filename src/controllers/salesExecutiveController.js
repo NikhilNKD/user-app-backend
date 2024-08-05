@@ -1,5 +1,6 @@
 import { calculateTotalCommissionService, checkSalesAssociateService, checkUserService, getCommissionByLevelService, getMyTeamService, getProfileService, getShopsService, getTotalCommissionService, getUserLevelService, submitTeamMemberService, updateProfileService, updateShopkeeperProfileService } from '../services/salesExecutiveService.js';
 import { submitFormService , registerSalesService} from '../services/salesExecutiveService.js';
+import { NotFoundError } from '../utils/errorHandlers.js';
 import { uploadImage } from '../services/s3Service.js';
 export const checkUserController = async (req, res) => {
   const { phoneNumber } = req.body;
@@ -23,15 +24,19 @@ export const submitFormController = async (req, res) => {
   const commissionLevel = 'L0';
 
   try {
-    if (!firstName || !lastName || !phoneNumber || !pincode) {
-      return res.status(400).json({ success: false, message: 'All fields are required' });
+    if (!req.body || !firstName || !lastName || !phoneNumber || !pincode) {
+      throw new NotFoundError("Required fields are missing");
     }
 
     const result = await submitFormService(firstName, lastName, phoneNumber, pincode, commissionLevel);
     res.json({ success: result });
   } catch (error) {
-    console.error('Error in submitFormController:', error);
-    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+    res.status(error.statusCode || 500).json({
+      success: false,
+      data: null,
+      message: error.message || 'Error while creating user',
+      error: error.message,
+    });
   }
 };
 
@@ -44,22 +49,27 @@ export const submitFormController = async (req, res) => {
   
     try {
       if (!phoneNumber || !firstName  || !pincode || !addedBy) {
-        console.log(phoneNumber, firstName, lastName, pincode, addedBy,'---')
-        return res.status(400).json({ error: 'All required fields must be provided' });
+        throw new NotFoundError("Required fields are missing");
       }
   
       const result = await submitTeamMemberService({ phoneNumber, firstName, lastName, pincode, aadhar, upi, pancard, addedBy, level });
   
-      if (result?.message) {
+      if (result) {
         res.json({ success: true, message: result.message });
-      }else if (result?.error){
-        return res.status(400).json({ success: false, error: result.error });
-      } else {
-        res.status(400).json({success: false, error: 'Failed to add team member' });
       }
+      // else if (result?.error){
+      //   return res.status(400).json({ success: false, error: result.error });
+      // } else {
+      //   res.status(400).json({success: false, error: 'Failed to add team member' });
+      // }
     } catch (error) {
       console.error('Error submitting team member:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(error.statusCode || 500).json({
+        success: false,
+        data: null,
+        message: error.message || 'Error while adding team member',
+        error: error.message,
+      });
     }
   };
 
@@ -79,7 +89,12 @@ export const submitFormController = async (req, res) => {
         }
     } catch (error) {
         console.error('Error fetching team data:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(error.statusCode || 500).json({
+          success: false,
+          data: null,
+          message: error.message || 'Error while adding team member',
+          error: error.message,
+        });
     }
 };
 
@@ -293,17 +308,32 @@ export const submitFormController = async (req, res) => {
         selectedSubCategory,
     } = req.body;
 
-    const imageData = {
-        name: "",
-        buffer: "",
-        mimetype: ""
-    };
-    if (req.file) {
-        imageData.name = req.file.originalname;
-        imageData.buffer = req.file.buffer;
-        imageData.mimetype = req.file.mimetype;
-    }
-
+    // Initialize file data
+    // const imageData = {
+    //   name: "",
+    //   buffer: "",
+    //   mimetype: ""
+    // };
+    // const bannerData = {
+    //   name: "",
+    //   buffer: "",
+    //   mimetype: ""
+    // };
+    // // Check for uploaded files
+    // if (req.files['image']) {
+    //   const imageFile = req.files['image'][0];
+    //   imageData.name = imageFile.originalname;
+    //   imageData.buffer = imageFile.buffer;
+    //   imageData.mimetype = imageFile.mimetype;
+    // }
+    // if (req.files['banner']) {
+    //   const bannerFile = req.files['banner'][0];
+    //   bannerData.name = bannerFile.originalname;
+    //   bannerData.buffer = bannerFile.buffer;
+    //   bannerData.mimetype = bannerFile.mimetype;
+    // }
+    const imageData = req.files['image'] ? req.files['image'][0] : null;
+    const bannerData = req.files['banner'] ? req.files['banner'][0] : null;
     try {
         const result = await registerSalesService({
             phoneNumber,
@@ -316,7 +346,8 @@ export const submitFormController = async (req, res) => {
             salesAssociateNumber,
             selectedCategory,
             selectedSubCategory,
-            imageData, // Ensure imageData is included, even if it's empty
+            imageData, 
+            bannerData
         });
 
         res.status(result.status).json({ message: result.message });

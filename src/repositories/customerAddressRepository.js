@@ -2,6 +2,7 @@
 
 import { AppDataSource } from '../config/data-source.js';
 import { NewCustomer } from '../entities/NewCustomer.js';
+import { InternalServerError } from '../utils/errorHandlers.js';
 
 export const getCustomerAddressRepository = async (phoneNumber) => {
   try {
@@ -13,6 +14,6 @@ export const getCustomerAddressRepository = async (phoneNumber) => {
 
     return customer ? customer.address : null;
   } catch (error) {
-    throw new Error('Error in getCustomerAddressRepository: ' + error.message);
+    throw new InternalServerError('Error in getCustomerAddressRepository: ' + error.message)
   }
 };
