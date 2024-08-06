@@ -9,7 +9,9 @@ import {
     registerShopkeeperController,
     myOrderShopkeeperController,
     getCustomersByShopkeeperController,
-    productManagerShopkeeperController
+    productManagerShopkeeperController,
+    paymentManagerShopkeeperController,
+    placeOrderShopkeeperController
 } from '../../controllers/shopkeeperDetailsController.js';
 import { uploadS3 } from '../../utils/helper.js';
 
@@ -29,6 +31,12 @@ router.get('/shopkeeper-customers', getCustomersByShopkeeperController);
 
 // Route to get shopkeeper customers by shopID
 router.get('/shopkeeper-products', productManagerShopkeeperController);
+
+// Route to get shopkeeper payments by shopID
+router.get('/shopkeeper-payments', paymentManagerShopkeeperController);
+
+// Route to get shopkeeper payments by shopID
+router.post('/place-order', placeOrderShopkeeperController);
 
 // Route to get shopkeeper details by phone number
 router.get('/details/:phoneNumber', getShopkeeperDetailsByPhoneNumberController);

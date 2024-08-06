@@ -1,5 +1,49 @@
 // src/services/mainServiceService.js
+import { getSalesExecutiveRepos, getShopkeeperRepo } from '../repositories/salesExecutiveRepository.js';
 import { getMainServicesBySubCategoryRepository ,getSubServicesByMainServiceId,saveSelectedServices,getSelectedMainServicesRepository,getSelectedSubServicesRepository   } from '../repositories/shopkeeperServiceRepository.js';
+
+export const registerServiceProviderService = async (shopkeeperData)=>{
+  try {
+      // console.log(shopkeeperData)
+      if (!shopkeeperData || !shopkeeperData.phoneNumber || !shopkeeperData.shopID ) {
+          throw new NotFoundError("Required fields are missing");
+      }
+      const shopkeeperRepo = await getShopkeeperRepo();
+      const salesAssociateRepo = getSalesExecutiveRepos();
+      
+      const exists = await shopkeeperRepo.findOne({ where: { phoneNumber: shopkeeperData.phoneNumber } })
+      if (exists) {
+        throw new ConflictError("Shopkeeper is already registed");
+      }
+      if(shopkeeperData.salesAssociateNumber){
+        const salesAssociate = await salesAssociateRepo.findOne({ where: { phoneNumber: shopkeeperData.salesAssociateNumber } });
+        if (!salesAssociate) {
+            throw new NotFoundError("Sales Associate number is not valid");
+        }
+      }
+      let imageData = shopkeeperData.imageData;
+      let bannerData = shopkeeperData.bannerData;
+      const imageKey = imageData ? `${imageData.originalname}_${Date.now()}` : null;
+      const bannerKey = bannerData ? `${bannerData.originalname}_${Date.now()}` : null;
+      const [imageUrl, bannerUrl] = await Promise.all([
+        imageData ? uploadImageToS3(imageData, imageKey) : Promise.resolve(null),
+        bannerData ? uploadImageToS3(bannerData, bannerKey) : Promise.resolve(null)
+      ]);
+      
+      delete shopkeeperData.imageData;
+
+      const shopkeeper = shopkeeperRepo.create({
+        ...shopkeeperData,
+        profilePicture: imageUrl,
+        shopBanner:bannerUrl 
+      });
+      await shopkeeperRepo.save(shopkeeper);
+      return { status: 200, message: "Service Provider registered successfully", data: shopkeeper };
+  } catch (error) {
+      console.error("Error in registerServiceProviderService", error.message);
+      throw error
+  }
+}
 
 export const getMainServicesBySubCategoryService = async (subCategory) => {
     try {

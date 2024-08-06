@@ -1,6 +1,50 @@
 // src/controllers/mainServiceController.js
-import { getMainServicesBySubCategoryService } from '../services/shopkeeperServices.js';
+import { getMainServicesBySubCategoryService, registerServiceProviderService } from '../services/shopkeeperServices.js';
 import { getSubServicesByMainServiceIdService,getSelectedMainServicesService ,saveSelectedServicesService,getSelectedSubServicesService  } from '../services/shopkeeperServices.js';
+
+export const registerServiceController =async(req, res) =>{
+  const {
+      phoneNumber,
+      shopkeeperName,
+      shopID,
+      pincode,
+      shopState,
+      city,
+      address,
+      salesAssociateNumber,
+      selectedCategory,
+      selectedSubCategory,
+  } = req.body;
+  const imageData = req.files['image'] ? req.files['image'][0] : null;
+  const bannerData = req.files['banner'] ? req.files['banner'][0] : null;
+
+  try {
+      const result = await registerServiceProviderService({
+          phoneNumber,
+          shopkeeperName,
+          shopID,
+          pincode,
+          shopState,
+          city,
+          address,
+          salesAssociateNumber,
+          selectedCategory,
+          selectedSubCategory,
+          imageData, 
+          bannerData
+      });
+
+      res.status(result.status).json({ message: result.message, data: result.data });
+  } catch (error) {
+      console.log('Error registering shopkeeper:', error.message);
+      res.status(error.statusCode || 500).json({
+          success: false,
+          data: null,
+          message: error.message || 'Error while registering Service provider',
+          error: error.message,
+        });
+  }
+}
 
 
 export const getMainServicesBySubCategory = async (req, res) => {

@@ -7,7 +7,9 @@ import {
     findShopkeeperByPhoneNumber,
     getMyOrdersShopkeeper,
     getCustomersByShopID,
-    getProductsByShopkeeper
+    getProductsByShopkeeper,
+    getPaymentsByShopkeeper,
+    getOrderPlacedByShopkeeper
 } from '../repositories/shopkeeperDetailsRepository.js';
 import { getSalesExecutiveRepos, getShopkeeperRepo } from '../repositories/salesExecutiveRepository.js';
 import { uploadImageToS3 } from '../utils/helper.js';
@@ -89,14 +91,9 @@ export const getShopkeeperDetailsByPhoneNumberService = async (phoneNumber) => {
                 message: 'Shopkeeper details fetched successfully',
             };
         }
-        return {
-            status: 404,
-            success: false,
-            data: null,
-            message: 'Shopkeeper not found',
-        };
+        throw new NotFoundError("Shopkeeper not found")
     } catch (error) {
-        throw new Error('Error fetching shopkeeper details: ' + error.message);
+        throw error;
     }
 };
 
@@ -112,14 +109,9 @@ export const getShopkeeperDetailsByShopIDService = async (shopID) => {
                 message: 'Shopkeeper details fetched successfully',
             };
         }
-        return {
-            status: 404,
-            success: false,
-            data: null,
-            message: 'Shopkeeper not found',
-        };
+        throw new NotFoundError("Shopkeeper not found")
     } catch (error) {
-        throw new Error('Error fetching shopkeeper details: ' + error.message);
+        throw error;
     }
 };
 
@@ -132,17 +124,43 @@ export const getProductsByShopkeeperService = async (phoneNumber) => {
                 status: 200,
                 success: true,
                 data: shopkeeper,
+                message: 'Shopkeeper Products fetched successfully',
+            };
+        }
+        throw new NotFoundError("products not found")
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Get shopkeeper details by shop ID
+export const getPaymentsByShopkeeperService = async (shopID, period) => {
+    try {
+        const shopkeeper = await getPaymentsByShopkeeper(shopID, period);
+        if (shopkeeper) {
+            return shopkeeper
+        }
+        throw new NotFoundError("no payments")
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Get shopkeeper details by shop ID
+export const placeOrderShopkeeperService = async (orderDetails) => {
+    try {
+        const shopkeeper = await getOrderPlacedByShopkeeper(orderDetails);
+        if (shopkeeper) {
+            return {
+                status: 200,
+                success: true,
+                data: shopkeeper,
                 message: 'Shopkeeper details fetched successfully',
             };
         }
-        return {
-            status: 404,
-            success: false,
-            data: null,
-            message: 'Shopkeeper not found',
-        };
+        throw new NotFoundError("no order placed")
     } catch (error) {
-        throw new Error('Error fetching shopkeeper details: ' + error.message);
+        throw error;
     }
 };
 

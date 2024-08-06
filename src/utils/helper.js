@@ -32,3 +32,31 @@ export const parseOpenAIResponse = async (content) => {
         weightType: extractValue('Weight Type')
     };
 };
+
+export const getDateRange = (period) => {
+  const now = new Date();
+  let startDate;
+  switch (period) {
+    case 'today':
+      startDate = new Date(now.setHours(0, 0, 0, 0));
+      break;
+    case 'yesterday':
+      startDate = new Date(now.setDate(now.getDate() - 1)).setHours(0, 0, 0, 0);
+      break;
+    case 'one_week':
+      startDate = new Date(now.setDate(now.getDate() - 7)).setHours(0, 0, 0, 0);
+      break;
+    case '30_days':
+      startDate = new Date(now.setDate(now.getDate() - 30)).setHours(0, 0, 0, 0);
+      break;
+    case 'all_time':
+      startDate = new Date('1970-01-01'); // Very old date for all-time range
+      break;
+    default:
+      throw new Error('Invalid period');
+  }
+  return {
+    startDate: new Date(startDate),
+    endDate: new Date()
+  };
+};

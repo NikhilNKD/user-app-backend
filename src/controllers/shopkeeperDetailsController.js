@@ -7,7 +7,9 @@ import {
     getShopkeeperOrdersService, 
     registerShopkeeperService,
     getCustomersService,
-    getProductsByShopkeeperService
+    getProductsByShopkeeperService,
+    getPaymentsByShopkeeperService,
+    placeOrderShopkeeperService
 } from '../services/shopkeeperDetailsService.js';
 
 import { NotFoundError } from '../utils/errorHandlers.js';
@@ -114,7 +116,7 @@ export const productManagerShopkeeperController = async (req, res) => {
         const { phoneNumber } = req.query;
 
         if (!phoneNumber) {
-        return res.status(400).json({ message: 'Phone number is required' });
+        throw new NotFoundError('Phone number is required' );
         }
 
     const products = await getProductsByShopkeeperService(phoneNumber);
@@ -128,7 +130,56 @@ export const productManagerShopkeeperController = async (req, res) => {
         res.status(error.statusCode || 500).json({
             success: false,
             data: null,
-            message: error.message || 'Error while registering shopkeeper',
+            message: error.message || 'Error while fetching Products',
+            error: error.message,
+          });
+    }
+}
+
+// Get shopkeeper payment details by phone number
+export const paymentManagerShopkeeperController = async (req, res) => {
+    try {
+        const { shopID, period } = req.query;
+
+        if (!shopID) {
+        throw new NotFoundError('Phone number is required');
+        }
+
+    const payments = await getPaymentsByShopkeeperService(shopID, period);
+
+    res.status(200).json({
+      message: 'Payments retrieved successfully',
+      data: payments
+    });
+    } catch (error) {
+        console.log('Error productManagerShopkeeperController: ', error.message);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            data: null,
+            message: error.message || 'Error while fetching payments',
+            error: error.message,
+          });
+    }
+}
+
+// Get shopkeeper payment details by phone number
+export const placeOrderShopkeeperController = async (req, res) => {
+    try {
+        const { custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, customerName, shopkeeperPhoneNumber } = req.body;
+		if(!custPhoneNumber || !shopID || !cartItems || !totalPrice  || !customerName || !shopkeeperPhoneNumber) throw new NotFoundError('Missing required fields');
+        console.log(req.body)
+      const orderPlace = await placeOrderShopkeeperService(req.body);
+
+    res.status(200).json({
+      message: 'order placed successfully',
+      data: orderPlace
+    });
+    } catch (error) {
+        console.log('Error placeOrderShopkeeperController: ', error.message);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            data: null,
+            message: error.message || 'Error while placing order',
             error: error.message,
           });
     }

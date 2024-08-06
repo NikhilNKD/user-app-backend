@@ -37,7 +37,6 @@ export const placeOrderRepository = async (custPhoneNumber, shopID, cartItems, t
       customerName,
       shopkeeperPhoneNumber,
     });
-    console.log(order, "fslklkl")
     await orderRepository.save(order);
     return { success: true, message: 'Order placed successfully' };
   } catch (error) {
