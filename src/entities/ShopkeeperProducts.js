@@ -10,12 +10,13 @@ export const ShopkeeperProducts = new EntitySchema({
       type: 'int',
       generated: true,
     },
-    phoneNumber: {
+    shopID: {
       type: 'varchar',
-      length: 15,
+      length: 15
     },
     productId: {
       type: 'int',
+      unique: true,
     },
   },
   relations: {

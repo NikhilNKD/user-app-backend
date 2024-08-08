@@ -24,9 +24,19 @@ export const getProductsByCategory = async (category) => {
 };
 
 // Add a product to a shopkeeper's list
-export const addProductToShopkeeper = async (shopkeeperPhoneNumber, productId) => {
+export const addProductToShopkeeper = async (shopID, productData, picture_path) => {
     try {
-        return await addProductToShopkeeperRepo(shopkeeperPhoneNumber, productId);
+        if(picture_path){
+            const key = picture_path.originalname + Date.now();
+            const uploadMediaFile = await uploadImage(picture_path,key);
+    
+            if (!uploadMediaFile) {
+                throw new InternalServerError("Errow while uploading image to cloud");
+            }
+            picture_path = uploadMediaFile;
+        }
+        const product = await addProductToShopkeeperRepo(shopID, productData, picture_path);
+        return product;
     } catch (error) {
         throw error; 
     }

@@ -1,7 +1,8 @@
 import { AppDataSource } from '../config/data-source.js';
 import { TblProductMaster } from '../entities/TblProductMaster.js';
 import { ShopkeeperProducts } from '../entities/ShopkeeperProducts.js';
-import { InternalServerError } from '../utils/errorHandlers.js';
+import { InternalServerError, NotFoundError } from '../utils/errorHandlers.js';
+import { Shopkeeper } from '../entities/Shopkeeper.js';
 
 //   const openai = new OpenAI();
 
@@ -21,11 +22,26 @@ export const getProductsByCategory = async (category) => {
 };
 
 // Add a product to a shopkeeper's list
-export const addProductToShopkeeper = async (shopkeeperPhoneNumber, productId) => {
+export const addProductToShopkeeper = async (shopID, productData, picture_path) => {
     try {
-        const shopkeeperProductRepository = AppDataSource.getRepository(ShopkeeperProducts);
-        const newEntry = shopkeeperProductRepository.create({ phoneNumber: shopkeeperPhoneNumber, productId });
-        await shopkeeperProductRepository.save(newEntry);
+        const shopkeeperRepo = AppDataSource.getRepository(Shopkeeper);
+        const productRepo = AppDataSource.getRepository(TblProductMaster);
+        const shopkeeperProductRepo = AppDataSource.getRepository(ShopkeeperProducts);
+       // Find shopkeeper by phone number
+       const shopkeeper = await shopkeeperRepo.findOneBy({ shopID: shopID });
+       if (!shopkeeper) {
+           throw NotFoundError('Shopkeeper not found');
+       }
+       // Save the product
+       const product = await productRepo.save({ ...productData, picture_path });
+
+       // Add the product to shopkeeper's products list
+       const shopkeeperProduct = shopkeeperProductRepo.create({
+           shopID: shopID,
+           productId: product.id
+       });
+        await shopkeeperProductRepo.save(shopkeeperProduct);
+       return product;
     } catch (error) {
         throw new InternalServerError(error.message)
     }

@@ -1,6 +1,6 @@
 // src/controllers/productInventoryController.js
 import { getProductsByCategory, addProductToShopkeeper , addMediaProductService} from '../services/productInventoryService.js';
-import { BadRequestError, CustomError, InternalServerError } from '../utils/errorHandlers.js';
+import { BadRequestError, CustomError, InternalServerError, NotFoundError } from '../utils/errorHandlers.js';
 
 
 // Fetch products by category
@@ -29,16 +29,31 @@ export const getProductsByCategoryController = async (req, res) => {
 // Add a product to a shopkeeper's list
 export const addProductToShopkeeperController = async (req, res) => {
     try {
-        const { shopkeeperPhoneNumber, productId } = req.body;
-
+        const { shopID } = req.body;
+        const productData = req.body;
         if (!req.body) throw new BadRequestError("Request body is missing.");
-        if (!shopkeeperPhoneNumber)  throw new BadRequestError("Shopkeeper phone number is required.");
-        if (!productId)  throw new BadRequestError("Product ID is required.");
+        if (!shopID)  throw new BadRequestError("Shopkeeper shopID is required.");
+        if (!productData)  throw new BadRequestError("Product data is required.");
+
+        const requiredFields = ['product_name', 'brand_name', 'price', 'weight', 'weight_type'];
+        for (const field of requiredFields) {
+          if (!productData[field]) {
+           throw new NotFoundError(`Missing required field: ${field}`);
+          }
+        }
         
-        await addProductToShopkeeper(shopkeeperPhoneNumber, productId);
+        // Validate price as a number
+        if (isNaN(productData.price) || parseFloat(productData.price) <= 0) {
+          return res.status(400).send('Invalid price value');
+        }
+        let picture_path = null;
+        if(req.file){
+            picture_path = req.file;
+        }
+        const product = await addProductToShopkeeper(shopID, productData, picture_path);
         res.status(200).json({
             success: true,
-            data: null,
+            data: product,
             message: 'Product added to shopkeeper\'s list successfully'
         });
     } catch (error) {
@@ -56,10 +71,13 @@ export const addMediaProductToShopkeeperController = async (req, res) => {
     try {
         if(!req.file) throw new BadRequestError("Picture is missing");
         if(!req.body) throw new BadRequestError("PhoneNumber is missing");
-        const mediaFile = req.file;
+        const mediaFiles = req.file;
         const { shopkeeperPhoneNumber } = req.body;
 
-        const result = await addMediaProductService(shopkeeperPhoneNumber, mediaFile);
+        const result = await addMediaProductService(shopkeeperPhoneNumber, mediaFiles);
+        // const results = await Promise.all(
+        //     mediaFiles.map(file => addMediaProductService(shopkeeperPhoneNumber, file))
+        // );
 
         res.status(200).json({
             success: true,

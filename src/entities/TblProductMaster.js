@@ -31,6 +31,7 @@ export const TblProductMaster = new EntitySchema({
         },
         type: {
             type: 'varchar',
+            nullable: true,
         },
         picture_path: {
             type: 'varchar',

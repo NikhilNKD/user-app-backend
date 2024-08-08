@@ -8,6 +8,6 @@ const router = Router();
 router.get('/products/:category', getProductsByCategoryController);
 
 // Route to add a product to a shopkeeper's list
-router.post('/add-product', addProductToShopkeeperController);
-router.post('/add-media-product',uploadS3.single('mediaFile'), addMediaProductToShopkeeperController);
+router.post('/add-product',uploadS3.single('picture'), addProductToShopkeeperController);
+router.post('/add-media-product',uploadS3.single('mediaFiles'), addMediaProductToShopkeeperController);
 export default router;

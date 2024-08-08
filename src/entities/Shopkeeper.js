@@ -40,7 +40,7 @@ export const Shopkeeper = new EntitySchema({
       length: 15,
       nullable: true,
     },
-    selectedCategory: {
+    category: {
       type: 'varchar',
       nullable: true,
     },
@@ -52,7 +52,7 @@ export const Shopkeeper = new EntitySchema({
       type: 'varchar',
       nullable: true,
     },
-    selectedSubCategory: {
+    subCategory: {
       type: 'varchar',
       nullable: true,
     },
@@ -62,8 +62,9 @@ export const Shopkeeper = new EntitySchema({
       unique: true,
     },
     shopType: {
-      type: 'varchar',
-      nullable: true,
+      type: 'enum',
+      enum: ['general', 'service'],
+      nullable: false,
     },
     deliverToHome: {
       type: 'varchar',

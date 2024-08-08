@@ -19,7 +19,7 @@ import { ConflictError, InternalServerError, NotFoundError } from '../utils/erro
 export const registerShopkeeperService = async (shopkeeperData)=>{
     try {
         // console.log(shopkeeperData)
-        if (!shopkeeperData || !shopkeeperData.phoneNumber || !shopkeeperData.shopID ) {
+        if (!shopkeeperData || !shopkeeperData.phoneNumber || !shopkeeperData.shopID || !shopkeeperData.shopType ) {
             throw new NotFoundError("Required fields are missing");
         }
         const shopkeeperRepo = await getShopkeeperRepo();
@@ -116,17 +116,11 @@ export const getShopkeeperDetailsByShopIDService = async (shopID) => {
 };
 
 // Get shopkeeper details by shop ID
-export const getProductsByShopkeeperService = async (phoneNumber) => {
+export const getProductsByShopkeeperService = async (shopID) => {
     try {
-        const shopkeeper = await getProductsByShopkeeper(phoneNumber);
-        if (shopkeeper) {
-            return {
-                status: 200,
-                success: true,
-                data: shopkeeper,
-                message: 'Shopkeeper Products fetched successfully',
-            };
-        }
+        const shopkeeper = await getProductsByShopkeeper(shopID);
+        if (shopkeeper) return shopkeeper 
+           
         throw new NotFoundError("products not found")
     } catch (error) {
         throw error;
@@ -149,15 +143,8 @@ export const getPaymentsByShopkeeperService = async (shopID, period) => {
 // Get shopkeeper details by shop ID
 export const placeOrderShopkeeperService = async (orderDetails) => {
     try {
-        const shopkeeper = await getOrderPlacedByShopkeeper(orderDetails);
-        if (shopkeeper) {
-            return {
-                status: 200,
-                success: true,
-                data: shopkeeper,
-                message: 'Shopkeeper details fetched successfully',
-            };
-        }
+        const order = await getOrderPlacedByShopkeeper(orderDetails);
+        if (order) return order;
         throw new NotFoundError("no order placed")
     } catch (error) {
         throw error;

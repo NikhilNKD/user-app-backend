@@ -24,8 +24,10 @@ export const registerShopkeeperController = async(req, res) =>{
         city,
         address,
         salesAssociateNumber,
-        selectedCategory,
-        selectedSubCategory,
+        category,
+        subCategory,
+        shopType,
+        deliverToHome,
     } = req.body;
     const imageData = req.files['image'] ? req.files['image'][0] : null;
     const bannerData = req.files['banner'] ? req.files['banner'][0] : null;
@@ -40,8 +42,10 @@ export const registerShopkeeperController = async(req, res) =>{
             city,
             address,
             salesAssociateNumber,
-            selectedCategory,
-            selectedSubCategory,
+            category,
+            subCategory,
+            shopType,
+            deliverToHome,
             imageData, 
             bannerData
         });
@@ -113,17 +117,19 @@ export const getCustomersByShopkeeperController = async(req, res) => {
 // Get shopkeeper details by phone number
 export const productManagerShopkeeperController = async (req, res) => {
     try {
-        const { phoneNumber } = req.query;
+        const { shopID } = req.query;
 
-        if (!phoneNumber) {
-        throw new NotFoundError('Phone number is required' );
+        if (!shopID) {
+        throw new NotFoundError('shopID is required' );
         }
 
-    const products = await getProductsByShopkeeperService(phoneNumber);
+    const products = await getProductsByShopkeeperService(shopID);
 
     res.status(200).json({
-      message: 'Products retrieved successfully',
-      data: products
+        status: 200,
+        success: true,
+        data: products,
+        message: 'Shopkeeper Products fetched successfully',
     });
     } catch (error) {
         console.log('Error productManagerShopkeeperController: ', error.message);
@@ -142,7 +148,7 @@ export const paymentManagerShopkeeperController = async (req, res) => {
         const { shopID, period } = req.query;
 
         if (!shopID) {
-        throw new NotFoundError('Phone number is required');
+        throw new NotFoundError('shopID is required');
         }
 
     const payments = await getPaymentsByShopkeeperService(shopID, period);
@@ -167,13 +173,14 @@ export const placeOrderShopkeeperController = async (req, res) => {
     try {
         const { custPhoneNumber, shopID, cartItems, totalPrice, selectedDate, selectedTime, customerName, shopkeeperPhoneNumber } = req.body;
 		if(!custPhoneNumber || !shopID || !cartItems || !totalPrice  || !customerName || !shopkeeperPhoneNumber) throw new NotFoundError('Missing required fields');
-        console.log(req.body)
-      const orderPlace = await placeOrderShopkeeperService(req.body);
+        const orderPlace = await placeOrderShopkeeperService(req.body);
 
-    res.status(200).json({
-      message: 'order placed successfully',
-      data: orderPlace
-    });
+        res.status(200).json({
+                    status: 200,
+                    success: true,
+                    data: orderPlace,
+                    message: 'order placed successfully',
+                });
     } catch (error) {
         console.log('Error placeOrderShopkeeperController: ', error.message);
         res.status(error.statusCode || 500).json({

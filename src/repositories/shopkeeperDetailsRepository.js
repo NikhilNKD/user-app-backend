@@ -83,7 +83,7 @@ export const getCustomersByShopID = async (shopID) => {
 };
 
 // Get shopkeeper products  by phoneNumber
-export const getProductsByShopkeeper = async (phoneNumber) => {
+export const getProductsByShopkeeper = async (shopID) => {
   try {
     const shopkeeperProductRepo =
       AppDataSource.getRepository(ShopkeeperProducts);
@@ -91,7 +91,7 @@ export const getProductsByShopkeeper = async (phoneNumber) => {
     const products = await shopkeeperProductRepo
       .createQueryBuilder('shopkeeperProduct')
       .leftJoinAndSelect('shopkeeperProduct.product', 'product')
-      .where('shopkeeperProduct.phoneNumber = :phoneNumber', { phoneNumber })
+      .where('shopkeeperProduct.shopID = :shopID', { shopID })
       .getMany();
     // Map to include only necessary fields
     return products.map((shopkeeperProduct) => {
@@ -114,7 +114,7 @@ export const getPaymentsByShopkeeper = async (shopID, period) => {
     // console.log(phoneNumber, period)
     const { startDate, endDate } = getDateRange(period);
     const orderRepo = AppDataSource.getRepository(TblOrders);
-    
+    console.log(startDate, endDate)
     // Fetch orders within the date range
     const orders = await orderRepo.find({
       where: {
@@ -122,6 +122,7 @@ export const getPaymentsByShopkeeper = async (shopID, period) => {
         created_at: Between(startDate, endDate)
       }
     });
+    console.log(orders, "f000")
     // Calculate total payments
     const totalPayments = orders.reduce((sum, order) => sum + parseFloat(order.totalPrice), 0);
     const data = orders.map(order => ({

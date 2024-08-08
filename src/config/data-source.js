@@ -20,6 +20,7 @@ import { Payment } from '../entities/Payment.js';
 import { PaymentDetail } from '../entities/PaymentDetail.js';
 import {TblSalonMainServices} from '../entities/TblSalonMainServices.js';
 import {TblSalonSubSubServices} from '../entities/TblSalonSubSubServices.js';
+import { ShopkeeperService } from '../entities/shopkeeperService.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -54,6 +55,7 @@ export const AppDataSource = new DataSource({
         Otp,
         Payment,
         PaymentDetail,
+        ShopkeeperService,
     ],
     migrations: [],
     subscribers: [],
